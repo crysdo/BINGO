@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Crysdo Bingo Generator</title>
+  <style>
+    :root{
+      --bg:#0b0b10; --card:#141423; --cell:#1b1b2f; --cell2:#232342;
+      --text:#f3f3ff; --muted:#b9b9d6; --accent:#9b8cff; --win:#4ef0a6; --mark:#ffd66e;
+      --border:rgba(255,255,255,.10);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: radial-gradient(1200px 600px at 20% 0%, rgba(155,140,255,.20), transparent 55%),
+                  radial-gradient(1200px 600px at 80% 0%, rgba(78,240,166,.12), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+    .wrap{max-width:1100px; margin:0 auto; padding:24px;}
+    header{
+      display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;
+      margin-bottom:16px;
+    }
+    .title{
+      display:flex; flex-direction:column; gap:4px;
+    }
+    .title h1{margin:0; font-size:20px; letter-spacing:.2px}
+    .title p{margin:0; color:var(--muted); font-size:13px}
+    .controls{
+      display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+      background: rgba(255,255,255,.04);
+      border:1px solid var(--border);
+      padding:10px; border-radius:14px;
+    }
+    button, input{
+      border-radius:12px; border:1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      padding:10px 12px;
+      font-weight:600;
+      cursor:pointer;
+    }
+    button:hover{border-color: rgba(155,140,255,.45)}
+    .pill{
+      display:flex; align-items:center; gap:8px;
+      padding:8px 10px; border-radius:12px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+      font-size:12px;
+      user-select:none;
+    }
+    .pill code{color:var(--text)}
+    .gridWrap{
+      background: rgba(255,255,255,.03);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:14px;
+    }
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:10px;
+      table-layout:fixed;
+    }
+    th{
+      color:var(--muted);
+      font-size:13px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      text-align:center;
+      padding-bottom:2px;
+    }
+    td{
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px 12px;
+      min-height:90px;
+      height:110px;
+      vertical-align:middle;
+      text-align:center;
+      font-size:14px;
+      line-height:1.25;
+      cursor:pointer;
+      user-select:none;
+      position:relative;
+      overflow:hidden;
+    }
+    td:hover{border-color: rgba(155,140,255,.45)}
+    td.marked{
+      border-color: rgba(255,214,110,.55);
+      box-shadow: 0 0 0 2px rgba(255,214,110,.16) inset;
+    }
+    td.marked::after{
+      content:"✓";
+      position:absolute;
+      top:10px; right:12px;
+      font-weight:900;
+      color:var(--mark);
+      font-size:16px;
+      opacity:.95;
+    }
+    td.free{
+      background: linear-gradient(180deg, rgba(155,140,255,.20), rgba(255,255,255,.03));
+      border-color: rgba(155,140,255,.55);
+      font-weight:800;
+      letter-spacing:.06em;
+    }
+    td.win{
+      border-color: rgba(78,240,166,.70);
+      box-shadow: 0 0 0 2px rgba(78,240,166,.18) inset;
+    }
+    .footer{
+      display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
+      margin-top:14px;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .toast{
+      position:fixed;
+      bottom:18px; left:50%;
+      transform:translateX(-50%);
+      background: rgba(20,20,35,.92);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:10px 12px;
+      font-size:13px;
+      color:var(--text);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .2s ease;
+    }
+    .toast.show{opacity:1}
+    @media (max-width:760px){
+      td{height:96px; font-size:13px; padding:12px 10px}
+      table{border-spacing:8px}
+      .controls{width:100%}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <h1>Community Bingo (Randomized)</h1>
+        <p>Refresh-proof with a shareable seed link • Click squares to mark • FREE space in the center</p>
+      </div>
+
+      <div class="controls">
+        <button id="newCardBtn" type="button">New Card</button>
+        <button id="copyLinkBtn" type="button">Copy Share Link</button>
+        <button id="resetMarksBtn" type="button">Reset Marks</button>
+        <span class="pill">Seed: <code id="seedLabel">—</code></span>
+      </div>
+    </header>
+
+    <div class="gridWrap">
+      <table aria-label="Bingo card">
+        <thead>
+          <tr>
+            <th>B</th><th>I</th><th>N</th><th>G</th><th>O</th>
+          </tr>
+        </thead>
+        <tbody id="bingoBody"></tbody>
+      </table>
+
+      <div class="footer">
+        <div>Tip: Share the link so your community gets the <strong>same</strong> card.</div>
+        <div id="status">No bingo yet ✨</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+/** =========================
+ *  1) EDIT YOUR POOL HERE
+ *  ========================= */
+const POOL = [
+  // Caleb – outfits & appearance
+  "Caleb wears a bow scarf",
+  "Caleb wears a silly hair accessory",
+  "Caleb wears earrings",
+  "Caleb wears an idol fit in the café",
+  "Caleb wears the kiss-mark decal (any location)",
+  "Caleb wears his colonel uniform (café or home)",
+  "Caleb’s outfit on the main L&DS page makes Crystal screenshot",
+  "Caleb wears an apple necklace on the homepage",
+
+  // Home feature moments
+  "Caleb asks to cuddle in the home",
+  "Caleb asks to dance in the home",
+  "Caleb vacuums the grass in the home",
+  "Caleb is reading in the home",
+  "Caleb is showering in the home",
+  "Crystal shows physical affection to Caleb in the home feature",
+  "Crystal arranges flowers with Caleb",
+  "Crystal makes Caleb sing in the home feature",
+
+  // Café moments
+  "Caleb is using the digital screen in the café",
+  "Caleb is reading a book in the café",
+  "Caleb plays with a paper airplane in the café",
+
+  // Gameplay / UI moments
+  "Crystal taps instead of holding down while leveling up",
+  "Caleb shows his phone lock screen",
+  "Crystal accidentally closes her screen share",
+  "Crystal exits Kitty Cards without playing",
+  "Crystal asks for coordinates in Radiant Galaxy",
+
+  // Gacha / progression
+  "Crystal gets a Caleb shard in Radiant Galaxy",
+  "Crystal gets a Caleb card from the general pool",
+  "Crystal upgrades a Caleb card",
+  "Crystal passes a Caleb orbit",
+  "Crystal adds protocores to Caleb cards in his orbit",
+  "If doing Caleb’s story, Crystal saves one of his voice lines",
+
+  // Claw machine
+  "Apple plush appears in the claw machine",
+  "Airplane plush appears in the claw machine",
+  "Caleb asks to take over the claw machine",
+
+  // Crystal commentary & habits
+  "Crystal calls Caleb “gege”",
+  "Crystal says “down bad” for Caleb",
+  "Crystal says she’s a gooner for Caleb",
+  "Crystal crashes out because of Caleb",
+  "Crystal giggles about something Caleb says",
+  "Crystal says “Caleb is so fine”",
+  "Crystal mentions the Holy Trinity",
+  "Crystal mentions the 4★ spicy",
+
+  // Apple moments
+  "Crystal wears an apple necklace",
+  "Crystal struggles to pronounce “asiatica apples”",
+
+  // Creative / personal
+  "Crystal shows off her art",
+  "Crystal talks about her nails or a new nail design",
+  "Crystal wears her Caleb shirt on stream",
+  "Crystal shows her small Caleb plush",
+
+  // Community / misc
+  "Crystal yells “Yuumi!”",
+  "Yumi makes an entrance",
+  "Crystal brings up Kaboom Kabobs",
+  "Crystal talks about Caleb’s birthday",
+  "Crystal talks about apron Caleb",
+  "Crystal talks about a Caleb cosplayer",
+  "Crystal mentions ponytail Caleb",
+  "Crystal mentions traveling to another country",
+
+  // Sylus moments
+  "Sylus makes Crystal remember she’s also a Sylus girlie",
+  "Sylus comes home faster than Caleb",
+  "Thirst-trap edits of Sylus, Caleb, or both make Crystal swoon",
+  "Crystal gets merch ideas from an older Sylus banner"
+];
+
+// Bingo constants
+const SIZE = 5;
+const FREE_INDEX = 12; // center of 5x5 (0-based flat index)
+
+/** =========================
+ *  2) SEEDED RANDOM (shareable)
+ *  ========================= */
+function xmur3(str) {
+  // string -> 32-bit seed
+  let h = 1779033703 ^ str.length;
+  for (let i = 0; i < str.length; i++) {
+    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  return function() {
+    h = Math.imul(h ^ (h >>> 16), 2246822507);
+    h = Math.imul(h ^ (h >>> 13), 3266489909);
+    h ^= h >>> 16;
+    return h >>> 0;
+  };
+}
+function mulberry32(a) {
+  return function() {
+    let t = a += 0x6D2B79F5;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function rngFromSeed(seedStr){
+  const seedFn = xmur3(seedStr);
+  return mulberry32(seedFn());
+}
+function randomSeed(){
+  // short-ish, URL-friendly seed
+  return Math.random().toString(36).slice(2, 10) + "-" + Date.now().toString(36);
+}
+
+/** =========================
+ *  3) CARD GENERATION
+ *  ========================= */
+function shuffle(array, rand){
+  const a = array.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(rand() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildCardItems(seedStr){
+  if (POOL.length < 24) {
+    throw new Error("Pool must contain at least 24 items (excluding FREE).");
+  }
+  const rand = rngFromSeed(seedStr);
+  const picked = shuffle(POOL, rand).slice(0, 24); // unique within card by slice
+  const cells = new Array(25);
+
+  // Fill all except center
+  let p = 0;
+  for(let i=0;i<25;i++){
+    if(i === FREE_INDEX){
+      cells[i] = "FREE";
+    } else {
+      cells[i] = picked[p++];
+    }
+  }
+  return cells;
+}
+
+/** =========================
+ *  4) RENDER + INTERACTION
+ *  ========================= */
+const bodyEl = document.getElementById("bingoBody");
+const seedLabel = document.getElementById("seedLabel");
+const statusEl = document.getElementById("status");
+const toastEl = document.getElementById("toast");
+
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add("show");
+  setTimeout(()=>toastEl.classList.remove("show"), 1400);
+}
+
+function getSeedFromUrl(){
+  const url = new URL(window.location.href);
+  return url.searchParams.get("seed");
+}
+function setSeedInUrl(seedStr){
+  const url = new URL(window.location.href);
+  url.searchParams.set("seed", seedStr);
+  history.replaceState({}, "", url.toString());
+}
+
+function storageKey(seedStr){ return "bingo_marks_" + seedStr; }
+
+function loadMarks(seedStr){
+  try{
+    const raw = localStorage.getItem(storageKey(seedStr));
+    if(!raw) return new Array(25).fill(false);
+    const marks = JSON.parse(raw);
+    if(Array.isArray(marks) && marks.length === 25) return marks.map(Boolean);
+  }catch(e){}
+  return new Array(25).fill(false);
+}
+function saveMarks(seedStr, marks){
+  localStorage.setItem(storageKey(seedStr), JSON.stringify(marks));
+}
+
+function renderCard(seedStr){
+  const cells = buildCardItems(seedStr);
+  const marks = loadMarks(seedStr);
+
+  // FREE is always marked
+  marks[FREE_INDEX] = true;
+
+  seedLabel.textContent = seedStr;
+
+  bodyEl.innerHTML = "";
+  let idx = 0;
+
+  for(let r=0;r<SIZE;r++){
+    const tr = document.createElement("tr");
+    for(let c=0;c<SIZE;c++){
+      const td = document.createElement("td");
+      const text = cells[idx];
+      td.textContent = text;
+
+      if(idx === FREE_INDEX){
+        td.classList.add("free","marked");
+      } else if(marks[idx]){
+        td.classList.add("marked");
+      }
+
+      td.dataset.index = String(idx);
+      td.addEventListener("click", () => {
+        const i = Number(td.dataset.index);
+        if(i === FREE_INDEX) return; // keep FREE always marked
+        marks[i] = !marks[i];
+        td.classList.toggle("marked", marks[i]);
+        saveMarks(seedStr, marks);
+        updateBingoHighlights(marks);
+      });
+
+      tr.appendChild(td);
+      idx++;
+    }
+    bodyEl.appendChild(tr);
+  }
+
+  updateBingoHighlights(marks);
+}
+
+function lines(){
+  // returns arrays of indices for all win lines
+  const ls = [];
+  // rows
+  for(let r=0;r<SIZE;r++){
+    const row = [];
+    for(let c=0;c<SIZE;c++) row.push(r*SIZE + c);
+    ls.push(row);
+  }
+  // cols
+  for(let c=0;c<SIZE;c++){
+    const col = [];
+    for(let r=0;r<SIZE;r++) col.push(r*SIZE + c);
+    ls.push(col);
+  }
+  // diags
+  ls.push([0,6,12,18,24]);
+  ls.push([4,8,12,16,20]);
+  return ls;
+}
+
+function updateBingoHighlights(marks){
+  // clear win highlights
+  [...bodyEl.querySelectorAll("td")].forEach(td => td.classList.remove("win"));
+
+  const winLines = [];
+  for(const line of lines()){
+    if(line.every(i => marks[i])) winLines.push(line);
+  }
+
+  if(winLines.length){
+    statusEl.textContent = `BINGO! (${winLines.length} line${winLines.length>1?"s":""})`;
+    statusEl.style.color = "var(--win)";
+    // highlight all winning line cells
+    const winSet = new Set(winLines.flat());
+    [...bodyEl.querySelectorAll("td")].forEach(td => {
+      const i = Number(td.dataset.index);
+      if(winSet.has(i)) td.classList.add("win");
+    });
+  } else {
+    statusEl.textContent = "No bingo yet ✨";
+    statusEl.style.color = "var(--muted)";
+  }
+}
+
+/** =========================
+ *  5) BUTTONS
+ *  ========================= */
+document.getElementById("newCardBtn").addEventListener("click", () => {
+  const seedStr = randomSeed();
+  setSeedInUrl(seedStr);
+  // new seed => fresh marks
+  localStorage.removeItem(storageKey(seedStr));
+  renderCard(seedStr);
+  toast("New card generated!");
+});
+
+document.getElementById("copyLinkBtn").addEventListener("click", async () => {
+  const url = window.location.href;
+  try{
+    await navigator.clipboard.writeText(url);
+    toast("Share link copied!");
+  }catch(e){
+    // fallback
+    prompt("Copy this link:", url);
+  }
+});
+
+document.getElementById("resetMarksBtn").addEventListener("click", () => {
+  const seedStr = getSeedFromUrl();
+  if(!seedStr) return;
+  const marks = new Array(25).fill(false);
+  marks[FREE_INDEX] = true;
+  saveMarks(seedStr, marks);
+  // re-render marks only
+  [...bodyEl.querySelectorAll("td")].forEach(td => {
+    const i = Number(td.dataset.index);
+    if(i === FREE_INDEX){
+      td.classList.add("marked");
+    } else {
+      td.classList.remove("marked");
+    }
+  });
+  updateBingoHighlights(marks);
+  toast("Marks reset!");
+});
+
+/** =========================
+ *  6) INIT
+ *  ========================= */
+(function init(){
+  let seedStr = getSeedFromUrl();
+  if(!seedStr){
+    seedStr = randomSeed();
+    setSeedInUrl(seedStr);
+  }
+  renderCard(seedStr);
+})();
+</script>
+</body>
+</html>
