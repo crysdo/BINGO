@@ -171,16 +171,14 @@
 
     td{
     background: rgba(255,255,255,.85);
-    border:1px solid rgba(198,69,58,.38);
-    border-radius:18px;
+  border:1px solid rgba(198,69,58,.38);
+  border-radius:18px;
 
-  /* ✅ responsive square cells */
-  aspect-ratio: 1 / 1;
-  height: auto;
+  /* ✅ 4x5-style responsive rectangle */
+  height: clamp(72px, 14vw, 110px);
 
-  /* ✅ responsive spacing + text */
   padding: clamp(8px, 1.2vw, 14px);
-  font-size: clamp(11px, 1.25vw, 14px);
+  font-size: clamp(11px, 1.2vw, 14px);
   line-height: 1.25;
 
   vertical-align: middle;
@@ -189,25 +187,12 @@
   user-select:none;
   position:relative;
   overflow:hidden;
+
+  word-break: normal;
+  overflow-wrap: normal;
+  white-space: normal;
+
   box-shadow: 0 6px 18px rgba(46,42,35,.06);
-
-  /* keeps long text from making cells look weird */
-  word-break: break-word;
-  overflow-wrap: anywhere;
-    }
-    td:hover{border-color: rgba(198,69,58,.70)}
-
-    td.marked{
-      box-shadow: 0 0 0 2px rgba(198,69,58,.20) inset, 0 6px 18px rgba(46,42,35,.06);
-    }
-    td.marked::after{
-      content:"✓";
-      position:absolute;
-      top:10px; right:12px;
-      font-weight:900;
-      color:var(--mark);
-      font-size:16px;
-      opacity:.95;
     }
 
     /* FREE center apple icon instead of text-only */
@@ -274,10 +259,10 @@
     .toast.show{opacity:1}
 
 @media (max-width:760px){
-  /* ✅ let aspect-ratio control sizing */
   td{
-    border-radius:16px;
-    padding: 8px;
+    height: clamp(68px, 18vw, 88px);
+    border-radius:14px;
+    padding: 6px;
     font-size: 11px;
   }
   table{ border-spacing: 6px; }
@@ -660,4 +645,5 @@ document.getElementById("resetMarksBtn").addEventListener("click", () => {
 </script>
 </body>
 </html>
+
 
