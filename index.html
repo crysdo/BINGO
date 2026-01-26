@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Bingo</title>
 
-  <!-- Cottagecore font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
@@ -15,17 +14,12 @@
       --paper:#fbf6ef;
       --ink:#2e2a23;
       --muted:#6e665b;
-
       --apple:#c6453a;
       --leaf:#5f7f50;
-      --leaf2:#3f6a45;
-
       --border:rgba(46,42,35,.18);
       --btn:#ffffffcc;
       --btnBorder:rgba(46,42,35,.20);
-
       --win:#2f7f5b;
-
       --winFillTop: rgba(95,127,80,.28);
       --winFillBot: rgba(95,127,80,.16);
     }
@@ -33,274 +27,79 @@
     *{box-sizing:border-box}
     body{
       margin:0;
-      font-family:"Quicksand", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      font-family:"Quicksand", system-ui;
       color:var(--ink);
-      background:
-        radial-gradient(circle at 1px 1px, rgba(46,42,35,.12) 1px, transparent 1.8px) 0 0 / 28px 28px,
-        radial-gradient(circle at 1px 1px, rgba(46,42,35,.08) 1px, transparent 1.8px) 14px 14px / 28px 28px,
-        linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0)),
-        var(--paper);
+      background: var(--paper);
     }
 
-    .wrap{
-      max-width:1100px;
-      margin:0 auto;
-      padding:20px 18px 28px;
-    }
-
-    .controls{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-      justify-content:center;
-      margin-bottom:14px;
-    }
-
+    .wrap{max-width:1100px;margin:0 auto;padding:20px}
+    .controls{display:flex;gap:10px;justify-content:center;margin-bottom:14px}
     button{
       border-radius:999px;
       border:1px solid var(--btnBorder);
       background:var(--btn);
-      color:var(--ink);
       padding:10px 14px;
       font-weight:700;
       cursor:pointer;
-      backdrop-filter: blur(6px);
-    }
-    button:hover{border-color: rgba(198,69,58,.38)}
-    .pill{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      padding:9px 12px;
-      border-radius:999px;
-      border:1px solid var(--btnBorder);
-      background:var(--btn);
-      color:var(--muted);
-      font-size:12px;
-      user-select:none;
-      backdrop-filter: blur(6px);
-    }
-    .pill code{color:var(--ink); font-weight:700}
-
-    .frame{
-      position:relative;
-      background:rgba(255,255,255,.55);
-      border:1px solid var(--border);
-      border-radius:26px;
-      padding:20px;
-      overflow:hidden;
-      box-shadow: 0 14px 40px rgba(46,42,35,.08);
-    }
-
-    .frame::before{
-      content:"";
-      position:absolute;
-      inset:14px;
-      border-radius:24px;
-      border:2px solid rgba(198,69,58,.35);
-      background:
-        radial-gradient(circle at 10px 10px, rgba(198,69,58,.16) 0 3px, transparent 3.2px) 0 0/20px 20px;
-      pointer-events:none;
-      mix-blend-mode:multiply;
-    }
-
-    .card{
-      position:relative;
-      border-radius:22px;
-      background:linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.68));
-      border:1px solid rgba(46,42,35,.14);
-      padding:16px 14px 12px;
-      margin:8px auto 0;
-      max-width:860px;
-    }
-
-    .corner{
-      position:absolute;
-      width:210px;
-      height:210px;
-      opacity:.95;
-      pointer-events:none;
-      filter: drop-shadow(0 8px 10px rgba(46,42,35,.10));
-    }
-    .corner.tl{top:-40px; left:-40px; transform: rotate(-10deg);}
-    .corner.tr{top:-44px; right:-44px; transform: rotate(10deg) scaleX(-1);}
-    .corner.bl{bottom:-46px; left:-46px; transform: rotate(10deg) scaleX(-1);}
-    .corner.br{bottom:-46px; right:-46px; transform: rotate(-10deg);}
-
-    .stitch{
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      opacity:.45;
-      background:
-        linear-gradient(45deg, transparent 0 48%, rgba(46,42,35,.10) 48% 52%, transparent 52% 100%) 0 0/80px 80px;
-      mask-image: radial-gradient(circle at 1px 1px, #000 1px, transparent 1.8px);
-      -webkit-mask-image: radial-gradient(circle at 1px 1px, #000 1px, transparent 1.8px);
-      mask-size: 18px 18px;
-      -webkit-mask-size: 18px 18px;
-      mask-position: 0 0;
-      -webkit-mask-position: 0 0;
     }
 
     table{
       width:100%;
-      border-collapse:separate;
-      border-spacing: clamp(6px, 1.1vw, 10px);
+      border-spacing:8px;
       table-layout:fixed;
-    }
-    th{
-      color:rgba(46,42,35,.55);
-      font-size:13px;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      text-align:center;
-      padding-bottom:0;
     }
 
     td{
-      background: rgba(255,255,255,.85);
+      background:#fff;
       border:1px solid rgba(198,69,58,.38);
       border-radius:18px;
-      height: clamp(72px, 14vw, 110px);
-
-      padding: clamp(8px, 1.2vw, 14px);
-      font-size: clamp(11px, 1.2vw, 14px);
-      line-height: 1.25;
-
-      vertical-align: middle;
+      padding:12px;
       text-align:center;
       cursor:pointer;
-      user-select:none;
       position:relative;
-      overflow:hidden;
-
-      word-break: normal;
-      overflow-wrap: normal;
-      white-space: normal;
-
-      box-shadow: 0 6px 18px rgba(46,42,35,.06);
-      transition: transform .08s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+      height:100px;
     }
-    td:active{ transform: scale(.985); }
-    td:hover{border-color: rgba(198,69,58,.70)}
 
     td.marked{
-      background: linear-gradient(180deg, rgba(198,69,58,.22), rgba(198,69,58,.14));
-      border-color: rgba(198,69,58,.80);
-      box-shadow:
-        0 0 0 2px rgba(198,69,58,.18) inset,
-        0 6px 18px rgba(46,42,35,.06);
+      background:rgba(198,69,58,.18);
+      border-color:rgba(198,69,58,.8);
     }
 
-    td.marked::after{
-      content:"✓";
-      position:absolute;
-      top:10px; right:12px;
-      font-weight:900;
-      color: rgba(255,255,255,.95);
-      font-size:16px;
-      opacity:.95;
-      text-shadow: 0 1px 0 rgba(46,42,35,.25);
-      pointer-events:none;
+    td.win{
+      background:linear-gradient(180deg,var(--winFillTop),var(--winFillBot));
+      border-color:var(--win);
     }
 
     td.free{
-      border-color: rgba(95,127,80,.75);
-      background:
-        radial-gradient(circle at 50% 42%, rgba(255,255,255,.95) 0 42%, rgba(255,255,255,.75) 43% 100%);
       font-weight:800;
-      letter-spacing:.06em;
-    }
-
-    td.free.marked{
-      background:
-        linear-gradient(180deg, rgba(198,69,58,.22), rgba(198,69,58,.14)),
-        radial-gradient(circle at 50% 42%, rgba(255,255,255,.95) 0 42%, rgba(255,255,255,.75) 43% 100%);
-      border-color: rgba(198,69,58,.80);
-      box-shadow:
-        0 0 0 2px rgba(198,69,58,.16) inset,
-        0 6px 18px rgba(46,42,35,.06);
-    }
-
-    .freeBadge{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      gap:6px;
-    }
-    .freeBadge span{
-      font-size:12px;
-      letter-spacing:.12em;
-      color:rgba(46,42,35,.65);
-    }
-    .freeApple{ width:44px; height:44px; display:block; }
-
-    td.win{
-      border-color: rgba(47,127,91,.85);
-      background: linear-gradient(180deg, var(--winFillTop), var(--winFillBot));
-      box-shadow:
-        0 0 0 2px rgba(47,127,91,.18) inset,
-        0 8px 24px rgba(46,42,35,.08);
-    }
-
-    td.marked.win,
-    td.free.marked.win{
-      background: linear-gradient(180deg, var(--winFillTop), var(--winFillBot));
-      border-color: rgba(47,127,91,.90);
-      box-shadow:
-        0 0 0 2px rgba(47,127,91,.20) inset,
-        0 10px 26px rgba(46,42,35,.10);
-    }
-
-    .footer{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-      justify-content:space-between;
-      margin-top:10px;
-      color:rgba(46,42,35,.62);
-      font-size:12px;
-      max-width:860px;
-      margin-left:auto;
-      margin-right:auto;
-      padding:0 6px;
+      letter-spacing:.08em;
     }
 
     .toast{
       position:fixed;
-      bottom:18px; left:50%;
+      bottom:18px;
+      left:50%;
       transform:translateX(-50%);
-      background: rgba(255,255,255,.92);
-      border:1px solid rgba(46,42,35,.18);
+      background:#fff;
+      padding:10px 14px;
       border-radius:999px;
-      padding:10px 12px;
-      font-size:13px;
-      color:var(--ink);
       opacity:0;
-      pointer-events:none;
-      transition: opacity .2s ease;
-      box-shadow: 0 10px 30px rgba(46,42,35,.10);
-      z-index: 30;
+      transition:.2s;
     }
     .toast.show{opacity:1}
 
-    /* Bingo celebration overlay */
     .bingoOverlay{
       position:fixed;
       inset:0;
       display:flex;
       align-items:center;
       justify-content:center;
-      pointer-events:none;
+      background:rgba(255,255,255,.6);
+      backdrop-filter:blur(2px);
       opacity:0;
       visibility:hidden;
-      transition: opacity .25s ease, visibility .25s ease;
-      z-index: 25;
-      background: radial-gradient(circle at 50% 35%, rgba(255,255,255,.55), rgba(251,246,239,.15));
-      backdrop-filter: blur(2px);
+      transition:.25s;
+      pointer-events:none;
     }
     .bingoOverlay.show{
       opacity:1;
@@ -308,492 +107,154 @@
     }
 
     .bingoBanner{
-      position:relative;
-      border-radius: 22px;
-      border: 1px solid rgba(46,42,35,.18);
-      background: rgba(255,255,255,.88);
-      padding: 18px 22px 16px;
-      box-shadow: 0 16px 50px rgba(46,42,35,.16);
+      background:#fff;
+      border-radius:20px;
+      padding:24px;
       text-align:center;
-      transform: scale(.92);
-      opacity: 0;
-      animation: bingoPop .9s ease forwards;
+      animation:pop .9s ease forwards;
     }
-    @keyframes bingoPop{
-      0%{ transform: scale(.92) translateY(10px); opacity:0; }
-      55%{ transform: scale(1.05) translateY(0); opacity:1; }
-      100%{ transform: scale(1) translateY(0); opacity:1; }
-    }
-    .bingoTitle{
-      font-weight: 900;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      font-size: 22px;
-      color: var(--win);
-    }
-    .bingoSub{
-      margin-top: 8px;
-      font-weight: 700;
-      color: rgba(46,42,35,.78);
-      font-size: 13px;
+    @keyframes pop{
+      0%{transform:scale(.9);opacity:0}
+      60%{transform:scale(1.05);opacity:1}
+      100%{transform:scale(1)}
     }
 
     .confetti{
       position:absolute;
       top:-10vh;
-      left:0;
-      font-size: 18px;
-      opacity:.95;
-      filter: drop-shadow(0 6px 10px rgba(46,42,35,.18));
-      animation: confettiFall linear forwards;
-      will-change: transform, opacity;
+      animation:fall linear forwards;
     }
-    @keyframes confettiFall{
-      0%{ transform: translate3d(var(--x, 0), -10vh, 0) rotate(0deg); opacity: 0; }
-      8%{ opacity: 1; }
-      100%{ transform: translate3d(var(--x, 0), 110vh, 0) rotate(var(--rot, 540deg)); opacity: 0; }
-    }
-
-    @media (max-width:760px){
-      td{
-        aspect-ratio: 3 / 4;
-        height: auto;
-        border-radius:14px;
-        padding: 6px;
-        font-size: 11px;
-      }
-      .corner{ width:150px; height:150px; }
-      .bingoTitle{ font-size: 18px; }
+    @keyframes fall{
+      to{transform:translateY(110vh) rotate(720deg);opacity:0}
     }
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="controls">
-      <button id="newCardBtn" type="button">🍎 New Card</button>
-      <button id="copyLinkBtn" type="button">🔗 Copy Share Link</button>
-      <button id="resetMarksBtn" type="button">🧺 Reset Marks</button>
-      <span class="pill">Seed: <code id="seedLabel">—</code></span>
-    </div>
-
-    <div class="frame">
-      <!-- Corner apples -->
-      <img class="corner tl" alt="" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='260'%20height='260'%20viewBox='0%200%20260%20260'%3E%3Cdefs%3E%3CradialGradient%20id='a'%20cx='45%25'%20cy='35%25'%20r='70%25'%3E%3Cstop%20offset='0'%20stop-color='%23ffefe8'/%3E%3Cstop%20offset='1'%20stop-color='%23c6453a'/%3E%3C/radialGradient%3E%3ClinearGradient%20id='l'%20x1='0'%20x2='1'%3E%3Cstop%20offset='0'%20stop-color='%235f7f50'/%3E%3Cstop%20offset='1'%20stop-color='%233f6a45'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width='260'%20height='260'%20fill='none'/%3E%3Cg%20opacity='.98'%3E%3Cpath%20d='M110%2055c18-18%2048-18%2066%200'%20fill='none'%20stroke='%233f6a45'%20stroke-width='10'%20stroke-linecap='round'/%3E%3Cpath%20d='M140%2062c-10-22%2010-42%2030-44'%20fill='none'%20stroke='%233f6a45'%20stroke-width='8'%20stroke-linecap='round'/%3E%3Cpath%20d='M120%2090c-46%200-74%2035-74%2076%200%2048%2040%2084%2094%2084%2052%200%2094-35%2094-84%200-41-28-76-74-76'%20fill='url(%23a)'/%3E%3Cpath%20d='M104%2092c-26-10-46-30-52-52%2030-2%2054%208%2066%2028'%20fill='url(%23l)'%20opacity='.92'/%3E%3Ccircle%20cx='165'%20cy='142'%20r='6'%20fill='%23ffefe8'%20opacity='.55'/%3E%3Ccircle%20cx='145'%20cy='162'%20r='4'%20fill='%23ffefe8'%20opacity='.35'/%3E%3C/g%3E%3C/svg%3E" />
-      <img class="corner tr" alt="" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='260'%20height='260'%20viewBox='0%200%20260%20260'%3E%3Cdefs%3E%3CradialGradient%20id='a'%20cx='45%25'%20cy='35%25'%20r='70%25'%3E%3Cstop%20offset='0'%20stop-color='%23ffefe8'/%3E%3Cstop%20offset='1'%20stop-color='%23c6453a'/%3E%3C/radialGradient%3E%3ClinearGradient%20id='l'%20x1='0'%20x2='1'%3E%3Cstop%20offset='0'%20stop-color='%235f7f50'/%3E%3Cstop%20offset='1'%20stop-color='%233f6a45'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width='260'%20height='260'%20fill='none'/%3E%3Cg%20opacity='.98'%3E%3Cpath%20d='M110%2055c18-18%2048-18%2066%200'%20fill='none'%20stroke='%233f6a45'%20stroke-width='10'%20stroke-linecap='round'/%3E%3Cpath%20d='M140%2062c-10-22%2010-42%2030-44'%20fill='none'%20stroke='%233f6a45'%20stroke-width='8'%20stroke-linecap='round'/%3E%3Cpath%20d='M120%2090c-46%200-74%2035-74%2076%200%2048%2040%2084%2094%2084%2052%200%2094-35%2094-84%200-41-28-76-74-76'%20fill='url(%23a)'/%3E%3Cpath%20d='M104%2092c-26-10-46-30-52-52%2030-2%2054%208%2066%2028'%20fill='url(%23l)'%20opacity='.92'/%3E%3Ccircle%20cx='165'%20cy='142'%20r='6'%20fill='%23ffefe8'%20opacity='.55'/%3E%3Ccircle%20cx='145'%20cy='162'%20r='4'%20fill='%23ffefe8'%20opacity='.35'/%3E%3C/g%3E%3C/svg%3E" />
-      <img class="corner bl" alt="" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='260'%20height='260'%20viewBox='0%200%20260%20260'%3E%3Cdefs%3E%3CradialGradient%20id='a'%20cx='45%25'%20cy='35%25'%20r='70%25'%3E%3Cstop%20offset='0'%20stop-color='%23ffefe8'/%3E%3Cstop%20offset='1'%20stop-color='%23c6453a'/%3E%3C/radialGradient%3E%3ClinearGradient%20id='l'%20x1='0'%20x2='1'%3E%3Cstop%20offset='0'%20stop-color='%235f7f50'/%3E%3Cstop%20offset='1'%20stop-color='%233f6a45'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width='260'%20height='260'%20fill='none'/%3E%3Cg%20opacity='.98'%3E%3Cpath%20d='M110%2055c18-18%2048-18%2066%200'%20fill='none'%20stroke='%233f6a45'%20stroke-width='10'%20stroke-linecap='round'/%3E%3Cpath%20d='M140%2062c-10-22%2010-42%2030-44'%20fill='none'%20stroke='%233f6a45'%20stroke-width='8'%20stroke-linecap='round'/%3E%3Cpath%20d='M120%2090c-46%200-74%2035-74%2076%200%2048%2040%2084%2094%2084%2052%200%2094-35%2094-84%200-41-28-76-74-76'%20fill='url(%23a)'/%3E%3Cpath%20d='M104%2092c-26-10-46-30-52-52%2030-2%2054%208%2066%2028'%20fill='url(%23l)'%20opacity='.92'/%3E%3Ccircle%20cx='165'%20cy='142'%20r='6'%20fill='%23ffefe8'%20opacity='.55'/%3E%3Ccircle%20cx='145'%20cy='162'%20r='4'%20fill='%23ffefe8'%20opacity='.35'/%3E%3C/g%3E%3C/svg%3E" />
-      <img class="corner br" alt="" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='260'%20height='260'%20viewBox='0%200%20260%20260'%3E%3Cdefs%3E%3CradialGradient%20id='a'%20cx='45%25'%20cy='35%25'%20r='70%25'%3E%3Cstop%20offset='0'%20stop-color='%23ffefe8'/%3E%3Cstop%20offset='1'%20stop-color='%23c6453a'/%3E%3C/radialGradient%3E%3ClinearGradient%20id='l'%20x1='0'%20x2='1'%3E%3Cstop%20offset='0'%20stop-color='%235f7f50'/%3E%3Cstop%20offset='1'%20stop-color='%233f6a45'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width='260'%20height='260'%20fill='none'/%3E%3Cg%20opacity='.98'%3E%3Cpath%20d='M110%2055c18-18%2048-18%2066%200'%20fill='none'%20stroke='%233f6a45'%20stroke-width='10'%20stroke-linecap='round'/%3E%3Cpath%20d='M140%2062c-10-22%2010-42%2030-44'%20fill='none'%20stroke='%233f6a45'%20stroke-width='8'%20stroke-linecap='round'/%3E%3Cpath%20d='M120%2090c-46%200-74%2035-74%2076%200%2048%2040%2084%2094%2084%2052%200%2094-35%2094-84%200-41-28-76-74-76'%20fill='url(%23a)'/%3E%3Cpath%20d='M104%2092c-26-10-46-30-52-52%2030-2%2054%208%2066%2028'%20fill='url(%23l)'%20opacity='.92'/%3E%3Ccircle%20cx='165'%20cy='142'%20r='6'%20fill='%23ffefe8'%20opacity='.55'/%3E%3Ccircle%20cx='145'%20cy='162'%20r='4'%20fill='%23ffefe8'%20opacity='.35'/%3E%3C/g%3E%3C/svg%3E" />
-
-      <div class="stitch"></div>
-
-      <div class="card">
-        <table aria-label="Bingo card">
-          <thead>
-            <tr>
-              <th>B</th><th>I</th><th>N</th><th>G</th><th>O</th>
-            </tr>
-          </thead>
-          <tbody id="bingoBody"></tbody>
-        </table>
-      </div>
-
-      <div class="footer">
-        <div>Tip: share the link so everyone gets the <strong>same</strong> card.</div>
-        <div id="status">No bingo yet 🍏</div>
-      </div>
-    </div>
+<div class="wrap">
+  <div class="controls">
+    <button id="newCardBtn">🍎 New Card</button>
+    <button id="resetBtn">🧺 Reset</button>
   </div>
 
-  <div class="toast" id="toast"></div>
+  <table>
+    <tbody id="bingoBody"></tbody>
+  </table>
+</div>
 
-  <div class="bingoOverlay" id="bingoOverlay" aria-hidden="true">
-    <div class="bingoBanner">
-      <div class="bingoTitle">BINGO! 🍏</div>
-      <div class="bingoSub" id="bingoSub">New card coming up…</div>
-    </div>
+<div class="toast" id="toast"></div>
+
+<div class="bingoOverlay" id="overlay">
+  <div class="bingoBanner">
+    <h2>BINGO 🍏</h2>
+    <p>New card coming up…</p>
   </div>
+</div>
 
 <script>
-/** =========================
- *  1) YOUR POOL
- *  ========================= */
-const POOL = [
-  "Caleb wears a bow scarf",
-  "Caleb wears a silly hair accessory",
-  "Caleb wears earrings",
-  "Caleb wears an idol fit in the café",
-  "Caleb wears the kiss-mark decal (any location)",
-  "Caleb wears his colonel uniform (café or home)",
-  "Caleb’s outfit on the main L&DS page makes Crystal screenshot",
-  "Caleb wears an apple necklace on the homepage",
-
-  "Caleb asks to cuddle in the home",
-  "Caleb asks to dance in the home",
-  "Caleb vacuums the grass in the home",
-  "Caleb is reading in the home",
-  "Caleb is showering in the home",
-  "Crystal shows physical affection to Caleb in the home feature",
-  "Crystal arranges flowers with Caleb",
-  "Crystal makes Caleb sing in the home feature",
-
-  "Caleb is using the digital screen in the café",
-  "Caleb is reading a book in the café",
-  "Caleb plays with a paper airplane in the café",
-
-  "Crystal taps instead of holding down while leveling up",
-  "Caleb shows his phone lock screen",
-  "Crystal accidentally closes her screen share",
-  "Crystal exits Kitty Cards without playing",
-  "Crystal asks for coordinates in Radiant Galaxy",
-
-  "Crystal gets a Caleb shard in Radiant Galaxy",
-  "Crystal gets a Caleb card from the general pool",
-  "Crystal upgrades a Caleb card",
-  "Crystal passes a Caleb orbit",
-  "Crystal adds protocores to Caleb cards in his orbit",
-  "If doing Caleb’s story, Crystal saves one of his voice lines",
-
-  "Apple plush appears in the claw machine",
-  "Airplane plush appears in the claw machine",
-  "Caleb asks to take over the claw machine",
-
-  "Crystal calls Caleb “gege”",
-  "Crystal says “down bad” for Caleb",
-  "Crystal says she’s a gooner for Caleb",
-  "Crystal crashes out because of Caleb",
-  "Crystal giggles about something Caleb says",
-  "Crystal says “Caleb is so fine”",
-  "Crystal mentions the Holy Trinity",
-  "Crystal mentions the 4★ spicy",
-
-  "Crystal wears an apple necklace",
-  "Crystal struggles to pronounce “asiatica apples”",
-
-  "Crystal shows off her art",
-  "Crystal talks about her nails or a new nail design",
-  "Crystal wears her Caleb shirt on stream",
-  "Crystal shows her small Caleb plush",
-
-  "Crystal yells “Yuumi!”",
-  "Yumi makes an entrance",
-  "Crystal brings up Kaboom Kabobs",
-  "Crystal talks about Caleb’s birthday",
-  "Crystal talks about apron Caleb",
-  "Crystal talks about a Caleb cosplayer",
-  "Crystal mentions ponytail Caleb",
-  "Crystal mentions traveling to another country",
-
-  "Sylus makes Crystal remember she’s also a Sylus girlie",
-  "Sylus comes home faster than Caleb",
-  "Thirst-trap edits of Sylus, Caleb, or both make Crystal swoon",
-  "Crystal gets merch ideas from an older Sylus banner"
-];
-
 const SIZE = 5;
 const FREE_INDEX = 12;
+const HOLD_MS = 5000; // ⭐⭐⭐ 5 SECONDS ⭐⭐⭐
 
-/** Seeded random */
-function xmur3(str) {
-  let h = 1779033703 ^ str.length;
-  for (let i = 0; i < str.length; i++) {
-    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
-    h = (h << 13) | (h >>> 19);
-  }
-  return function() {
-    h = Math.imul(h ^ (h >>> 16), 2246822507);
-    h = Math.imul(h ^ (h >>> 13), 3266489909);
-    h ^= h >>> 16;
-    return h >>> 0;
-  };
-}
-function mulberry32(a) {
-  return function() {
-    let t = a += 0x6D2B79F5;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-function rngFromSeed(seedStr){
-  const seedFn = xmur3(seedStr);
-  return mulberry32(seedFn());
-}
-function randomSeed(){
-  return Math.random().toString(36).slice(2, 10) + "-" + Date.now().toString(36);
+let marks = new Array(25).fill(false);
+let lock = false;
+
+const body = document.getElementById("bingoBody");
+const overlay = document.getElementById("overlay");
+const toast = document.getElementById("toast");
+
+function showToast(t){
+  toast.textContent=t;
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"),1500);
 }
 
-function shuffle(array, rand){
-  const a = array.slice();
-  for(let i = a.length - 1; i > 0; i--){
-    const j = Math.floor(rand() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
+function buildCard(){
+  body.innerHTML="";
+  marks.fill(false);
+  lock=false;
 
-function buildCardItems(seedStr){
-  if (POOL.length < 24) throw new Error("Pool must contain at least 24 items (excluding FREE).");
-  const rand = rngFromSeed(seedStr);
-  const picked = shuffle(POOL, rand).slice(0, 24);
-  const cells = new Array(25);
-
-  let p = 0;
-  for(let i=0;i<25;i++){
-    cells[i] = (i === FREE_INDEX) ? "FREE" : picked[p++];
-  }
-  return cells;
-}
-
-const bodyEl = document.getElementById("bingoBody");
-const seedLabel = document.getElementById("seedLabel");
-const statusEl = document.getElementById("status");
-const toastEl = document.getElementById("toast");
-
-const overlayEl = document.getElementById("bingoOverlay");
-const overlaySubEl = document.getElementById("bingoSub");
-
-let lastWinCount = 0;
-let overlayTimer = null;
-
-// global state (prevents reset desync)
-let currentSeed = null;
-let currentMarks = new Array(25).fill(false);
-
-// NEW: lock so you can't keep earning multiple bingos on same card
-let bingoLock = false;
-let nextCardTimer = null;
-
-function toast(msg){
-  toastEl.textContent = msg;
-  toastEl.classList.add("show");
-  setTimeout(()=>toastEl.classList.remove("show"), 1400);
-}
-
-function setSeedInUrl(seedStr){
-  const url = new URL(window.location.href);
-  url.searchParams.set("seed", seedStr);
-  history.replaceState({}, "", url.toString());
-}
-
-function storageKey(seedStr){ return "bingo_marks_" + seedStr; }
-
-function loadMarks(seedStr){
-  try{
-    const raw = localStorage.getItem(storageKey(seedStr));
-    if(!raw) return new Array(25).fill(false);
-    const marks = JSON.parse(raw);
-    if(Array.isArray(marks) && marks.length === 25) return marks.map(Boolean);
-  }catch(e){}
-  return new Array(25).fill(false);
-}
-function saveMarks(seedStr, marks){
-  localStorage.setItem(storageKey(seedStr), JSON.stringify(marks));
-}
-
-function startNewCard(reasonText){
-  if(nextCardTimer) clearTimeout(nextCardTimer);
-  bingoLock = false;
-  lastWinCount = 0;
-
-  const seedStr = randomSeed();
-  setSeedInUrl(seedStr);
-  localStorage.removeItem(storageKey(seedStr)); // always clean start
-  overlayEl.classList.remove("show");
-  renderCard(seedStr);
-
-  if(reasonText) toast(reasonText);
-}
-
-function celebrateBingoAndThenNewCard(){
-  // prevent multiple lines / multiple celebrations on same card
-  bingoLock = true;
-
-  overlaySubEl.textContent = "New card coming up… ✨";
-  overlayEl.classList.remove("show");
-  void overlayEl.offsetWidth;
-  overlayEl.classList.add("show");
-
-  const emojis = ["🍎","🍏","🍃","✨"];
-  const pieces = 30;
-  for(let i=0;i<pieces;i++){
-    const s = document.createElement("span");
-    s.className = "confetti";
-    s.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-
-    const left = Math.random() * 100;
-    const drift = (Math.random() * 40 - 20);
-    const dur = 2.2 + Math.random() * 1.6;
-    const delay = Math.random() * 0.35;
-    const size = 14 + Math.random() * 16;
-    const rot = 360 + Math.random() * 720;
-
-    s.style.left = left + "vw";
-    s.style.fontSize = size + "px";
-    s.style.setProperty("--x", drift + "vw");
-    s.style.setProperty("--rot", rot + "deg");
-    s.style.animationDuration = dur + "s";
-    s.style.animationDelay = delay + "s";
-
-    overlayEl.appendChild(s);
-    setTimeout(()=>s.remove(), (dur + delay) * 1000 + 50);
-  }
-
-  if(overlayTimer) clearTimeout(overlayTimer);
-  overlayTimer = setTimeout(()=>overlayEl.classList.remove("show"), 2300);
-
-  // NEW: after a short moment, auto-generate a new card
-  if(nextCardTimer) clearTimeout(nextCardTimer);
-  nextCardTimer = setTimeout(() => {
-    startNewCard("New card 🎴");
-  }, 1400);
-}
-
-function lines(){
-  const ls = [];
+  let idx=0;
   for(let r=0;r<SIZE;r++){
-    const row = [];
-    for(let c=0;c<SIZE;c++) row.push(r*SIZE + c);
-    ls.push(row);
-  }
-  for(let c=0;c<SIZE;c++){
-    const col = [];
-    for(let r=0;r<SIZE;r++) col.push(r*SIZE + c);
-    ls.push(col);
-  }
-  ls.push([0,6,12,18,24]);
-  ls.push([4,8,12,16,20]);
-  return ls;
-}
-
-function updateBingoHighlights(marks){
-  [...bodyEl.querySelectorAll("td")].forEach(td => td.classList.remove("win"));
-
-  const winLines = [];
-  for(const line of lines()){
-    if(line.every(i => marks[i])) winLines.push(line);
-  }
-
-  if(winLines.length){
-    statusEl.textContent = `BINGO! 🍏`;
-    statusEl.style.color = "var(--win)";
-
-    // highlight ONLY the first winning line (so it looks clean)
-    const winSet = new Set(winLines[0]);
-    [...bodyEl.querySelectorAll("td")].forEach(td => {
-      const i = Number(td.dataset.index);
-      if(winSet.has(i)) td.classList.add("win");
-    });
-
-    // NEW: only allow the first bingo, then immediately move to a new card
-    if(!bingoLock && lastWinCount === 0){
-      lastWinCount = 1;
-      celebrateBingoAndThenNewCard();
-    }
-  } else {
-    statusEl.textContent = "No bingo yet 🍏";
-    statusEl.style.color = "rgba(46,42,35,.62)";
-    lastWinCount = 0;
-  }
-}
-
-function renderCard(seedStr){
-  currentSeed = seedStr;
-  seedLabel.textContent = seedStr;
-
-  const cells = buildCardItems(seedStr);
-  currentMarks = loadMarks(seedStr);
-
-  bodyEl.innerHTML = "";
-  lastWinCount = 0;
-  bingoLock = false;
-
-  let idx = 0;
-  for(let r=0;r<SIZE;r++){
-    const tr = document.createElement("tr");
+    const tr=document.createElement("tr");
     for(let c=0;c<SIZE;c++){
-      const td = document.createElement("td");
-      td.dataset.index = String(idx);
+      const td=document.createElement("td");
+      td.dataset.i=idx;
 
-      const attachToggle = () => {
-        td.addEventListener("click", () => {
-          if(bingoLock) return; // NEW: once bingo happens, no more clicking this card
-          const i = Number(td.dataset.index);
-          currentMarks[i] = !currentMarks[i];
-          td.classList.toggle("marked", currentMarks[i]);
-          saveMarks(currentSeed, currentMarks);
-          updateBingoHighlights(currentMarks);
-        });
-      };
-
-      if(idx === FREE_INDEX){
+      if(idx===FREE_INDEX){
+        td.textContent="FREE";
         td.classList.add("free");
-        td.innerHTML = `
-          <div class="freeBadge">
-            <svg class="freeApple" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <defs>
-                <radialGradient id="g" cx="40%" cy="30%" r="70%">
-                  <stop offset="0" stop-color="#fff1eb"/>
-                  <stop offset="1" stop-color="#c6453a"/>
-                </radialGradient>
-              </defs>
-              <path d="M28 14c4-6 12-8 18-6" fill="none" stroke="#3f6a45" stroke-width="4" stroke-linecap="round"/>
-              <path d="M34 16c-2-8 4-14 10-15" fill="none" stroke="#3f6a45" stroke-width="3" stroke-linecap="round"/>
-              <path d="M32 18c-14 0-23 11-23 24 0 15 12 26 29 26 16 0 29-11 29-26 0-13-9-24-23-24" fill="url(#g)"/>
-              <path d="M18 20c-8-3-14-9-16-16 10-1 18 3 22 9" fill="#5f7f50" opacity=".9"/>
-              <circle cx="40" cy="36" r="3.5" fill="#fff1eb" opacity=".55"/>
-            </svg>
-            <span>FREE</span>
-          </div>
-        `;
-        if(currentMarks[idx]) td.classList.add("marked");
-        attachToggle();
       } else {
-        td.textContent = cells[idx];
-        if(currentMarks[idx]) td.classList.add("marked");
-        attachToggle();
+        td.textContent="Item "+(idx+1);
       }
+
+      td.onclick=()=>{
+        if(lock) return;
+        marks[idx]=!marks[idx];
+        td.classList.toggle("marked",marks[idx]);
+        checkBingo();
+      };
 
       tr.appendChild(td);
       idx++;
     }
-    bodyEl.appendChild(tr);
+    body.appendChild(tr);
   }
-
-  updateBingoHighlights(currentMarks);
 }
 
-/** Buttons */
-document.getElementById("newCardBtn").addEventListener("click", () => {
-  startNewCard("New card generated 🍎");
-});
+function lines(){
+  const l=[];
+  for(let r=0;r<SIZE;r++) l.push([...Array(5)].map((_,i)=>r*5+i));
+  for(let c=0;c<SIZE;c++) l.push([...Array(5)].map((_,i)=>i*5+c));
+  l.push([0,6,12,18,24],[4,8,12,16,20]);
+  return l;
+}
 
-document.getElementById("copyLinkBtn").addEventListener("click", async () => {
-  const url = window.location.href;
-  try{
-    await navigator.clipboard.writeText(url);
-    toast("Share link copied 🔗");
-  }catch(e){
-    prompt("Copy this link:", url);
+function checkBingo(){
+  for(const line of lines()){
+    if(line.every(i=>marks[i])){
+      triggerBingo(line);
+      return;
+    }
   }
-});
+}
 
-document.getElementById("resetMarksBtn").addEventListener("click", () => {
-  if(!currentSeed) return;
-  bingoLock = false;
-  lastWinCount = 0;
-  if(nextCardTimer) clearTimeout(nextCardTimer);
+function triggerBingo(line){
+  lock=true;
+  overlay.classList.add("show");
 
-  currentMarks = new Array(25).fill(false);
-  saveMarks(currentSeed, currentMarks);
-  overlayEl.classList.remove("show");
-  renderCard(currentSeed);
-  toast("Marks reset 🧺");
-});
+  line.forEach(i=>{
+    document.querySelector(`[data-i="${i}"]`).classList.add("win");
+  });
 
-/** INIT: always new card on refresh/load */
-(function init(){
-  startNewCard(); // no toast on load
-})();
+  for(let i=0;i<30;i++){
+    const s=document.createElement("span");
+    s.className="confetti";
+    s.textContent=["🍎","🍏","✨"][Math.floor(Math.random()*3)];
+    s.style.left=Math.random()*100+"vw";
+    s.style.fontSize=14+Math.random()*16+"px";
+    s.style.animationDuration=2+Math.random()*2+"s";
+    overlay.appendChild(s);
+    setTimeout(()=>s.remove(),4000);
+  }
+
+  setTimeout(()=>{
+    overlay.classList.remove("show");
+    buildCard();
+  },HOLD_MS);
+}
+
+document.getElementById("newCardBtn").onclick=()=>{
+  buildCard();
+  showToast("New card 🍎");
+};
+
+document.getElementById("resetBtn").onclick=()=>{
+  buildCard();
+  showToast("Reset 🧺");
+};
+
+buildCard();
 </script>
 </body>
 </html>
