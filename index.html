@@ -174,7 +174,7 @@
   border:1px solid rgba(198,69,58,.38);
   border-radius:18px;
 
-  /* ✅ 4x5-style responsive rectangle */
+  /* desktop/tablet sizing */
   height: clamp(72px, 14vw, 110px);
 
   padding: clamp(8px, 1.2vw, 14px);
@@ -260,13 +260,13 @@
 
 @media (max-width:760px){
   td{
-    height: clamp(68px, 18vw, 88px);
+    /* 🔥 MOBILE ONLY: 3x4 cards */
+    aspect-ratio: 3 / 4;
+    height: auto;
+
     border-radius:14px;
     padding: 6px;
     font-size: 11px;
-  }
-  table{ border-spacing: 6px; }
-  .corner{ width:150px; height:150px; }
     }
   </style>
 </head>
@@ -645,5 +645,6 @@ document.getElementById("resetMarksBtn").addEventListener("click", () => {
 </script>
 </body>
 </html>
+
 
 
