@@ -26,6 +26,10 @@
       --btnBorder:rgba(46,42,35,.20);
 
       --win:#2f7f5b;
+
+      /* NEW: light green win fill */
+      --winFillTop: rgba(95,127,80,.28);
+      --winFillBot: rgba(95,127,80,.16);
     }
 
     *{box-sizing:border-box}
@@ -188,7 +192,10 @@
       white-space: normal;
 
       box-shadow: 0 6px 18px rgba(46,42,35,.06);
+
+      transition: transform .08s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
     }
+    td:active{ transform: scale(.985); }
     td:hover{border-color: rgba(198,69,58,.70)}
 
     /* MARKED: full-tile apple tint */
@@ -213,6 +220,7 @@
       font-size:16px;
       opacity:.95;
       text-shadow: 0 1px 0 rgba(46,42,35,.25);
+      pointer-events:none;
     }
 
     /* FREE cell */
@@ -223,16 +231,20 @@
       font-weight:800;
       letter-spacing:.06em;
     }
+
+    /* FIX #1: make FREE marked look "filled in" too (apple tint overlay) */
     td.free.marked{
-      /* Keep FREE styling even though it is always marked */
       background:
+        linear-gradient(180deg, rgba(198,69,58,.22), rgba(198,69,58,.14)),
         radial-gradient(circle at 50% 42%, rgba(255,255,255,.95) 0 42%, rgba(255,255,255,.75) 43% 100%);
-      border-color: rgba(95,127,80,.75);
-      box-shadow: 0 0 0 2px rgba(95,127,80,.12) inset, 0 6px 18px rgba(46,42,35,.06);
+      border-color: rgba(198,69,58,.80);
+      box-shadow:
+        0 0 0 2px rgba(198,69,58,.16) inset,
+        0 6px 18px rgba(46,42,35,.06);
     }
+    /* Allow checkmark on FREE now (so it matches others) */
     td.free.marked::after{
-      /* Optional: hide checkmark on FREE if you want */
-      content:"";
+      content:"✓";
     }
 
     .freeBadge{
@@ -249,9 +261,23 @@
     }
     .freeApple{ width:44px; height:44px; display:block; }
 
+    /* FIX #2: Winning cells turn a light green */
     td.win{
-      border-color: rgba(47,127,91,.75);
-      box-shadow: 0 0 0 2px rgba(47,127,91,.18) inset, 0 8px 24px rgba(46,42,35,.08);
+      border-color: rgba(47,127,91,.85);
+      background: linear-gradient(180deg, var(--winFillTop), var(--winFillBot));
+      box-shadow:
+        0 0 0 2px rgba(47,127,91,.18) inset,
+        0 8px 24px rgba(46,42,35,.08);
+    }
+
+    /* If a cell is both marked + win, keep the green highlight (not red) */
+    td.marked.win,
+    td.free.marked.win{
+      background: linear-gradient(180deg, var(--winFillTop), var(--winFillBot));
+      border-color: rgba(47,127,91,.90);
+      box-shadow:
+        0 0 0 2px rgba(47,127,91,.20) inset,
+        0 10px 26px rgba(46,42,35,.10);
     }
 
     .footer{
@@ -283,8 +309,82 @@
       pointer-events:none;
       transition: opacity .2s ease;
       box-shadow: 0 10px 30px rgba(46,42,35,.10);
+      z-index: 30;
     }
     .toast.show{opacity:1}
+
+    /* ====== BINGO CELEBRATION (FIX #3) ====== */
+    .bingoOverlay{
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+      opacity:0;
+      visibility:hidden;
+      transition: opacity .25s ease, visibility .25s ease;
+      z-index: 25;
+      background: radial-gradient(circle at 50% 35%, rgba(255,255,255,.55), rgba(251,246,239,.15));
+      backdrop-filter: blur(2px);
+    }
+    .bingoOverlay.show{
+      opacity:1;
+      visibility:visible;
+    }
+
+    .bingoBanner{
+      position:relative;
+      border-radius: 22px;
+      border: 1px solid rgba(46,42,35,.18);
+      background: rgba(255,255,255,.88);
+      padding: 18px 22px 16px;
+      box-shadow: 0 16px 50px rgba(46,42,35,.16);
+      text-align:center;
+      transform: scale(.92);
+      opacity: .0;
+      animation: bingoPop .9s ease forwards;
+    }
+    @keyframes bingoPop{
+      0%{ transform: scale(.92) translateY(10px); opacity:0; }
+      55%{ transform: scale(1.05) translateY(0); opacity:1; }
+      100%{ transform: scale(1) translateY(0); opacity:1; }
+    }
+    .bingoTitle{
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-size: 22px;
+      color: var(--win);
+    }
+    .bingoSub{
+      margin-top: 8px;
+      font-weight: 700;
+      color: rgba(46,42,35,.78);
+      font-size: 13px;
+    }
+
+    .confetti{
+      position:absolute;
+      top:-10vh;
+      left:0;
+      font-size: 18px;
+      opacity:.95;
+      filter: drop-shadow(0 6px 10px rgba(46,42,35,.18));
+      animation: confettiFall linear forwards;
+      will-change: transform, opacity;
+    }
+    @keyframes confettiFall{
+      0%{
+        transform: translate3d(var(--x, 0), -10vh, 0) rotate(0deg);
+        opacity: 0;
+      }
+      8%{ opacity: 1; }
+      100%{
+        transform: translate3d(var(--x, 0), 110vh, 0) rotate(var(--rot, 540deg));
+        opacity: 0;
+      }
+    }
 
     /* ====== MOBILE ONLY: 3x4 cells ====== */
     @media (max-width:760px){
@@ -296,6 +396,7 @@
         font-size: 11px;
       }
       .corner{ width:150px; height:150px; }
+      .bingoTitle{ font-size: 18px; }
     }
   </style>
 </head>
@@ -337,6 +438,14 @@
   </div>
 
   <div class="toast" id="toast"></div>
+
+  <!-- NEW: Bingo celebration overlay -->
+  <div class="bingoOverlay" id="bingoOverlay" aria-hidden="true">
+    <div class="bingoBanner">
+      <div class="bingoTitle">BINGO! 🍏</div>
+      <div class="bingoSub" id="bingoSub">You got a line!</div>
+    </div>
+  </div>
 
 <script>
 /** =========================
@@ -489,6 +598,12 @@ const seedLabel = document.getElementById("seedLabel");
 const statusEl = document.getElementById("status");
 const toastEl = document.getElementById("toast");
 
+// NEW: celebration elements/state
+const overlayEl = document.getElementById("bingoOverlay");
+const overlaySubEl = document.getElementById("bingoSub");
+let lastWinCount = 0;
+let overlayTimer = null;
+
 function toast(msg){
   toastEl.textContent = msg;
   toastEl.classList.add("show");
@@ -520,6 +635,49 @@ function saveMarks(seedStr, marks){
   localStorage.setItem(storageKey(seedStr), JSON.stringify(marks));
 }
 
+// NEW: confetti + overlay animation
+function celebrateBingo(winCount){
+  overlaySubEl.textContent = winCount === 1
+    ? "You got 1 line! ✨"
+    : `You got ${winCount} lines! ✨`;
+
+  overlayEl.classList.remove("show");
+  // force reflow so the banner animation plays even if triggered twice quickly
+  void overlayEl.offsetWidth;
+  overlayEl.classList.add("show");
+
+  // spawn confetti
+  const emojis = ["🍎","🍏","🍃","✨"];
+  const pieces = 30;
+  for(let i=0;i<pieces;i++){
+    const s = document.createElement("span");
+    s.className = "confetti";
+    s.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    const left = Math.random() * 100;  // vw
+    const drift = (Math.random() * 40 - 20); // vw
+    const dur = 2.2 + Math.random() * 1.6; // s
+    const delay = Math.random() * 0.35; // s
+    const size = 14 + Math.random() * 16; // px
+    const rot = 360 + Math.random() * 720; // deg
+
+    s.style.left = left + "vw";
+    s.style.fontSize = size + "px";
+    s.style.setProperty("--x", drift + "vw");
+    s.style.setProperty("--rot", rot + "deg");
+    s.style.animationDuration = dur + "s";
+    s.style.animationDelay = delay + "s";
+
+    overlayEl.appendChild(s);
+
+    // cleanup
+    const removeAfter = (dur + delay) * 1000 + 50;
+    setTimeout(()=>s.remove(), removeAfter);
+  }
+
+  if(overlayTimer) clearTimeout(overlayTimer);
+  overlayTimer = setTimeout(()=>overlayEl.classList.remove("show"), 2300);
+}
+
 function renderCard(seedStr){
   const cells = buildCardItems(seedStr);
   const marks = loadMarks(seedStr);
@@ -529,6 +687,7 @@ function renderCard(seedStr){
 
   seedLabel.textContent = seedStr;
   bodyEl.innerHTML = "";
+  lastWinCount = 0; // reset win trigger per card render
 
   let idx = 0;
   for(let r=0;r<SIZE;r++){
@@ -598,6 +757,7 @@ function lines(){
 }
 
 function updateBingoHighlights(marks){
+  // Clear previous win highlights
   [...bodyEl.querySelectorAll("td")].forEach(td => td.classList.remove("win"));
 
   const winLines = [];
@@ -608,14 +768,22 @@ function updateBingoHighlights(marks){
   if(winLines.length){
     statusEl.textContent = `BINGO! (${winLines.length} line${winLines.length>1?"s":""}) 🍏`;
     statusEl.style.color = "var(--win)";
+
     const winSet = new Set(winLines.flat());
     [...bodyEl.querySelectorAll("td")].forEach(td => {
       const i = Number(td.dataset.index);
       if(winSet.has(i)) td.classList.add("win");
     });
+
+    // NEW: trigger celebration when first bingo happens or when win lines increase
+    if(winLines.length > lastWinCount){
+      celebrateBingo(winLines.length);
+      lastWinCount = winLines.length;
+    }
   } else {
     statusEl.textContent = "No bingo yet 🍏";
     statusEl.style.color = "rgba(46,42,35,.62)";
+    lastWinCount = 0;
   }
 }
 
@@ -652,6 +820,7 @@ document.getElementById("resetMarksBtn").addEventListener("click", () => {
     const i = Number(td.dataset.index);
     if(i === FREE_INDEX){
       td.classList.add("marked");
+      td.classList.remove("win");
     } else {
       td.classList.remove("marked");
       td.classList.remove("win");
