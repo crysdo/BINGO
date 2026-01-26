@@ -12,12 +12,13 @@
 
   <style>
     :root{
+      /* Cottagecore palette */
       --paper:#fbf6ef;
       --ink:#2e2a23;
       --muted:#6e665b;
 
-      --apple:#c6453a;
-      --leaf:#5f7f50;
+      --apple:#c6453a;         /* apple red */
+      --leaf:#5f7f50;          /* leaf green */
       --leaf2:#3f6a45;
 
       --border:rgba(46,42,35,.18);
@@ -49,6 +50,7 @@
       padding:20px 18px 28px;
     }
 
+    /* Top controls only (no title) */
     .controls{
       display:flex;
       flex-wrap:wrap;
@@ -84,6 +86,7 @@
     }
     .pill code{color:var(--ink); font-weight:700}
 
+    /* Decorative frame area */
     .frame{
       position:relative;
       background:rgba(255,255,255,.55);
@@ -94,6 +97,7 @@
       box-shadow: 0 14px 40px rgba(46,42,35,.08);
     }
 
+    /* Lace-y scallop border effect */
     .frame::before{
       content:"";
       position:absolute;
@@ -106,6 +110,7 @@
       mix-blend-mode:multiply;
     }
 
+    /* Inner card backing like paper */
     .card{
       position:relative;
       border-radius:22px;
@@ -116,6 +121,7 @@
       max-width:860px;
     }
 
+    /* Corner apple illustrations (SVG data URIs) */
     .corner{
       position:absolute;
       width:210px;
@@ -129,6 +135,7 @@
     .corner.bl{bottom:-46px; left:-46px; transform: rotate(10deg) scaleX(-1);}
     .corner.br{bottom:-46px; right:-46px; transform: rotate(-10deg);}
 
+    /* Stitch overlay */
     .stitch{
       position:absolute;
       inset:0;
@@ -159,31 +166,41 @@
       padding-bottom:0;
     }
 
+    /* ====== CELLS ====== */
     td{
       background: rgba(255,255,255,.85);
       border:1px solid rgba(198,69,58,.38);
       border-radius:18px;
       height: clamp(72px, 14vw, 110px);
+
       padding: clamp(8px, 1.2vw, 14px);
       font-size: clamp(11px, 1.2vw, 14px);
       line-height: 1.25;
+
       vertical-align: middle;
       text-align:center;
       cursor:pointer;
       user-select:none;
       position:relative;
       overflow:hidden;
+
       word-break: normal;
       overflow-wrap: normal;
       white-space: normal;
+
       box-shadow: 0 6px 18px rgba(46,42,35,.06);
       transition: transform .08s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
     }
     td:active{ transform: scale(.985); }
     td:hover{border-color: rgba(198,69,58,.70)}
 
+    /* MARKED: apple tint */
     td.marked{
-      background: linear-gradient(180deg, rgba(198,69,58,.22), rgba(198,69,58,.14));
+      background: linear-gradient(
+        180deg,
+        rgba(198,69,58,.22),
+        rgba(198,69,58,.14)
+      );
       border-color: rgba(198,69,58,.80);
       box-shadow:
         0 0 0 2px rgba(198,69,58,.18) inset,
@@ -202,13 +219,16 @@
       pointer-events:none;
     }
 
+    /* FREE cell */
     td.free{
       border-color: rgba(95,127,80,.75);
-      background: radial-gradient(circle at 50% 42%, rgba(255,255,255,.95) 0 42%, rgba(255,255,255,.75) 43% 100%);
+      background:
+        radial-gradient(circle at 50% 42%, rgba(255,255,255,.95) 0 42%, rgba(255,255,255,.75) 43% 100%);
       font-weight:800;
       letter-spacing:.06em;
     }
 
+    /* FREE when marked: apple tint overlay so it matches others */
     td.free.marked{
       background:
         linear-gradient(180deg, rgba(198,69,58,.22), rgba(198,69,58,.14)),
@@ -233,6 +253,7 @@
     }
     .freeApple{ width:44px; height:44px; display:block; }
 
+    /* Winning cells: light green */
     td.win{
       border-color: rgba(47,127,91,.85);
       background: linear-gradient(180deg, var(--winFillTop), var(--winFillBot));
@@ -241,6 +262,7 @@
         0 8px 24px rgba(46,42,35,.08);
     }
 
+    /* If a cell is both marked + win, keep green highlight */
     td.marked.win,
     td.free.marked.win{
       background: linear-gradient(180deg, var(--winFillTop), var(--winFillBot));
@@ -283,6 +305,7 @@
     }
     .toast.show{opacity:1}
 
+    /* ====== BINGO CELEBRATION ====== */
     .bingoOverlay{
       position:fixed;
       inset:0;
@@ -311,7 +334,7 @@
       box-shadow: 0 16px 50px rgba(46,42,35,.16);
       text-align:center;
       transform: scale(.92);
-      opacity: .0;
+      opacity: 0;
       animation: bingoPop .9s ease forwards;
     }
     @keyframes bingoPop{
@@ -344,11 +367,18 @@
       will-change: transform, opacity;
     }
     @keyframes confettiFall{
-      0%{ transform: translate3d(var(--x, 0), -10vh, 0) rotate(0deg); opacity: 0; }
+      0%{
+        transform: translate3d(var(--x, 0), -10vh, 0) rotate(0deg);
+        opacity: 0;
+      }
       8%{ opacity: 1; }
-      100%{ transform: translate3d(var(--x, 0), 110vh, 0) rotate(var(--rot, 540deg)); opacity: 0; }
+      100%{
+        transform: translate3d(var(--x, 0), 110vh, 0) rotate(var(--rot, 540deg));
+        opacity: 0;
+      }
     }
 
+    /* ====== MOBILE ONLY ====== */
     @media (max-width:760px){
       td{
         aspect-ratio: 3 / 4;
@@ -401,6 +431,7 @@
 
   <div class="toast" id="toast"></div>
 
+  <!-- Bingo celebration overlay -->
   <div class="bingoOverlay" id="bingoOverlay" aria-hidden="true">
     <div class="bingoBanner">
       <div class="bingoTitle">BINGO! 🍏</div>
@@ -561,8 +592,13 @@ const toastEl = document.getElementById("toast");
 
 const overlayEl = document.getElementById("bingoOverlay");
 const overlaySubEl = document.getElementById("bingoSub");
+
 let lastWinCount = 0;
 let overlayTimer = null;
+
+// IMPORTANT: global state so Reset Marks can't desync old click handlers
+let currentSeed = null;
+let currentMarks = new Array(25).fill(false);
 
 function toast(msg){
   toastEl.textContent = msg;
@@ -601,7 +637,7 @@ function celebrateBingo(winCount){
     : `You got ${winCount} lines! ✨`;
 
   overlayEl.classList.remove("show");
-  void overlayEl.offsetWidth;
+  void overlayEl.offsetWidth; // force reflow
   overlayEl.classList.add("show");
 
   const emojis = ["🍎","🍏","🍃","✨"];
@@ -610,12 +646,13 @@ function celebrateBingo(winCount){
     const s = document.createElement("span");
     s.className = "confetti";
     s.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-    const left = Math.random() * 100;
-    const drift = (Math.random() * 40 - 20);
-    const dur = 2.2 + Math.random() * 1.6;
-    const delay = Math.random() * 0.35;
-    const size = 14 + Math.random() * 16;
-    const rot = 360 + Math.random() * 720;
+
+    const left = Math.random() * 100;          // vw
+    const drift = (Math.random() * 40 - 20);   // vw
+    const dur = 2.2 + Math.random() * 1.6;     // s
+    const delay = Math.random() * 0.35;        // s
+    const size = 14 + Math.random() * 16;      // px
+    const rot = 360 + Math.random() * 720;     // deg
 
     s.style.left = left + "vw";
     s.style.fontSize = size + "px";
@@ -632,77 +669,6 @@ function celebrateBingo(winCount){
 
   if(overlayTimer) clearTimeout(overlayTimer);
   overlayTimer = setTimeout(()=>overlayEl.classList.remove("show"), 2300);
-}
-
-function renderCard(seedStr){
-  const cells = buildCardItems(seedStr);
-  const marks = loadMarks(seedStr);
-
-  // IMPORTANT CHANGE: FREE is NOT auto-marked anymore
-  seedLabel.textContent = seedStr;
-  bodyEl.innerHTML = "";
-  lastWinCount = 0;
-
-  let idx = 0;
-  for(let r=0;r<SIZE;r++){
-    const tr = document.createElement("tr");
-    for(let c=0;c<SIZE;c++){
-      const td = document.createElement("td");
-      td.dataset.index = String(idx);
-
-      if(idx === FREE_INDEX){
-        td.classList.add("free");
-        td.innerHTML = `
-          <div class="freeBadge">
-            <svg class="freeApple" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <defs>
-                <radialGradient id="g" cx="40%" cy="30%" r="70%">
-                  <stop offset="0" stop-color="#fff1eb"/>
-                  <stop offset="1" stop-color="#c6453a"/>
-                </radialGradient>
-              </defs>
-              <path d="M28 14c4-6 12-8 18-6" fill="none" stroke="#3f6a45" stroke-width="4" stroke-linecap="round"/>
-              <path d="M34 16c-2-8 4-14 10-15" fill="none" stroke="#3f6a45" stroke-width="3" stroke-linecap="round"/>
-              <path d="M32 18c-14 0-23 11-23 24 0 15 12 26 29 26 16 0 29-11 29-26 0-13-9-24-23-24" fill="url(#g)"/>
-              <path d="M18 20c-8-3-14-9-16-16 10-1 18 3 22 9" fill="#5f7f50" opacity=".9"/>
-              <circle cx="40" cy="36" r="3.5" fill="#fff1eb" opacity=".55"/>
-            </svg>
-            <span>FREE</span>
-          </div>
-        `;
-
-        // Apply saved marked state if any
-        if(marks[idx]) td.classList.add("marked");
-
-        // Make FREE clickable too
-        td.addEventListener("click", () => {
-          const i = Number(td.dataset.index);
-          marks[i] = !marks[i];
-          td.classList.toggle("marked", marks[i]);
-          saveMarks(seedStr, marks);
-          updateBingoHighlights(marks);
-        });
-
-      } else {
-        td.textContent = cells[idx];
-        if(marks[idx]) td.classList.add("marked");
-
-        td.addEventListener("click", () => {
-          const i = Number(td.dataset.index);
-          marks[i] = !marks[i];
-          td.classList.toggle("marked", marks[i]);
-          saveMarks(seedStr, marks);
-          updateBingoHighlights(marks);
-        });
-      }
-
-      tr.appendChild(td);
-      idx++;
-    }
-    bodyEl.appendChild(tr);
-  }
-
-  updateBingoHighlights(marks);
 }
 
 function lines(){
@@ -751,6 +717,70 @@ function updateBingoHighlights(marks){
   }
 }
 
+function renderCard(seedStr){
+  currentSeed = seedStr;
+  seedLabel.textContent = seedStr;
+
+  const cells = buildCardItems(seedStr);
+  currentMarks = loadMarks(seedStr);
+
+  bodyEl.innerHTML = "";
+  lastWinCount = 0;
+
+  let idx = 0;
+  for(let r=0;r<SIZE;r++){
+    const tr = document.createElement("tr");
+    for(let c=0;c<SIZE;c++){
+      const td = document.createElement("td");
+      td.dataset.index = String(idx);
+
+      const attachToggle = () => {
+        td.addEventListener("click", () => {
+          const i = Number(td.dataset.index);
+          currentMarks[i] = !currentMarks[i];
+          td.classList.toggle("marked", currentMarks[i]);
+          saveMarks(currentSeed, currentMarks);
+          updateBingoHighlights(currentMarks);
+        });
+      };
+
+      if(idx === FREE_INDEX){
+        td.classList.add("free");
+        td.innerHTML = `
+          <div class="freeBadge">
+            <svg class="freeApple" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <defs>
+                <radialGradient id="g" cx="40%" cy="30%" r="70%">
+                  <stop offset="0" stop-color="#fff1eb"/>
+                  <stop offset="1" stop-color="#c6453a"/>
+                </radialGradient>
+              </defs>
+              <path d="M28 14c4-6 12-8 18-6" fill="none" stroke="#3f6a45" stroke-width="4" stroke-linecap="round"/>
+              <path d="M34 16c-2-8 4-14 10-15" fill="none" stroke="#3f6a45" stroke-width="3" stroke-linecap="round"/>
+              <path d="M32 18c-14 0-23 11-23 24 0 15 12 26 29 26 16 0 29-11 29-26 0-13-9-24-23-24" fill="url(#g)"/>
+              <path d="M18 20c-8-3-14-9-16-16 10-1 18 3 22 9" fill="#5f7f50" opacity=".9"/>
+              <circle cx="40" cy="36" r="3.5" fill="#fff1eb" opacity=".55"/>
+            </svg>
+            <span>FREE</span>
+          </div>
+        `;
+        if(currentMarks[idx]) td.classList.add("marked");
+        attachToggle();
+      } else {
+        td.textContent = cells[idx];
+        if(currentMarks[idx]) td.classList.add("marked");
+        attachToggle();
+      }
+
+      tr.appendChild(td);
+      idx++;
+    }
+    bodyEl.appendChild(tr);
+  }
+
+  updateBingoHighlights(currentMarks);
+}
+
 /** =========================
  *  5) BUTTONS
  *  ========================= */
@@ -758,6 +788,7 @@ document.getElementById("newCardBtn").addEventListener("click", () => {
   const seedStr = randomSeed();
   setSeedInUrl(seedStr);
   localStorage.removeItem(storageKey(seedStr));
+  overlayEl.classList.remove("show");
   renderCard(seedStr);
   toast("New card generated 🍎");
 });
@@ -776,16 +807,14 @@ document.getElementById("resetMarksBtn").addEventListener("click", () => {
   const seedStr = getSeedFromUrl();
   if(!seedStr) return;
 
-  // IMPORTANT CHANGE: reset EVERYTHING including FREE to unmarked
-  const marks = new Array(25).fill(false);
-  saveMarks(seedStr, marks);
+  currentSeed = seedStr;
+  currentMarks = new Array(25).fill(false);
+  saveMarks(currentSeed, currentMarks);
 
-  [...bodyEl.querySelectorAll("td")].forEach(td => {
-    td.classList.remove("marked");
-    td.classList.remove("win");
-  });
+  lastWinCount = 0;
+  overlayEl.classList.remove("show");
+  renderCard(currentSeed);
 
-  updateBingoHighlights(marks);
   toast("Marks reset 🧺");
 });
 
