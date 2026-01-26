@@ -12,13 +12,12 @@
 
   <style>
     :root{
-      /* Cottagecore palette */
       --paper:#fbf6ef;
       --ink:#2e2a23;
       --muted:#6e665b;
 
-      --apple:#c6453a;         /* apple red */
-      --leaf:#5f7f50;          /* leaf green */
+      --apple:#c6453a;
+      --leaf:#5f7f50;
       --leaf2:#3f6a45;
 
       --border:rgba(46,42,35,.18);
@@ -27,7 +26,6 @@
 
       --win:#2f7f5b;
 
-      /* light green win fill */
       --winFillTop: rgba(95,127,80,.28);
       --winFillBot: rgba(95,127,80,.16);
     }
@@ -50,7 +48,6 @@
       padding:20px 18px 28px;
     }
 
-    /* Top controls only (no title) */
     .controls{
       display:flex;
       flex-wrap:wrap;
@@ -86,7 +83,6 @@
     }
     .pill code{color:var(--ink); font-weight:700}
 
-    /* Decorative frame area */
     .frame{
       position:relative;
       background:rgba(255,255,255,.55);
@@ -97,7 +93,6 @@
       box-shadow: 0 14px 40px rgba(46,42,35,.08);
     }
 
-    /* Lace-y scallop border effect */
     .frame::before{
       content:"";
       position:absolute;
@@ -110,7 +105,6 @@
       mix-blend-mode:multiply;
     }
 
-    /* Inner card backing like paper */
     .card{
       position:relative;
       border-radius:22px;
@@ -121,7 +115,6 @@
       max-width:860px;
     }
 
-    /* Corner apple illustrations (SVG data URIs) */
     .corner{
       position:absolute;
       width:210px;
@@ -135,7 +128,6 @@
     .corner.bl{bottom:-46px; left:-46px; transform: rotate(10deg) scaleX(-1);}
     .corner.br{bottom:-46px; right:-46px; transform: rotate(-10deg);}
 
-    /* Stitch overlay */
     .stitch{
       position:absolute;
       inset:0;
@@ -166,7 +158,6 @@
       padding-bottom:0;
     }
 
-    /* ====== CELLS ====== */
     td{
       background: rgba(255,255,255,.85);
       border:1px solid rgba(198,69,58,.38);
@@ -194,13 +185,8 @@
     td:active{ transform: scale(.985); }
     td:hover{border-color: rgba(198,69,58,.70)}
 
-    /* MARKED: apple tint */
     td.marked{
-      background: linear-gradient(
-        180deg,
-        rgba(198,69,58,.22),
-        rgba(198,69,58,.14)
-      );
+      background: linear-gradient(180deg, rgba(198,69,58,.22), rgba(198,69,58,.14));
       border-color: rgba(198,69,58,.80);
       box-shadow:
         0 0 0 2px rgba(198,69,58,.18) inset,
@@ -219,7 +205,6 @@
       pointer-events:none;
     }
 
-    /* FREE cell */
     td.free{
       border-color: rgba(95,127,80,.75);
       background:
@@ -228,7 +213,6 @@
       letter-spacing:.06em;
     }
 
-    /* FREE when marked: apple tint overlay so it matches others */
     td.free.marked{
       background:
         linear-gradient(180deg, rgba(198,69,58,.22), rgba(198,69,58,.14)),
@@ -253,7 +237,6 @@
     }
     .freeApple{ width:44px; height:44px; display:block; }
 
-    /* Winning cells: light green */
     td.win{
       border-color: rgba(47,127,91,.85);
       background: linear-gradient(180deg, var(--winFillTop), var(--winFillBot));
@@ -262,7 +245,6 @@
         0 8px 24px rgba(46,42,35,.08);
     }
 
-    /* If a cell is both marked + win, keep green highlight */
     td.marked.win,
     td.free.marked.win{
       background: linear-gradient(180deg, var(--winFillTop), var(--winFillBot));
@@ -305,7 +287,7 @@
     }
     .toast.show{opacity:1}
 
-    /* ====== BINGO CELEBRATION ====== */
+    /* Bingo celebration overlay */
     .bingoOverlay{
       position:fixed;
       inset:0;
@@ -367,18 +349,11 @@
       will-change: transform, opacity;
     }
     @keyframes confettiFall{
-      0%{
-        transform: translate3d(var(--x, 0), -10vh, 0) rotate(0deg);
-        opacity: 0;
-      }
+      0%{ transform: translate3d(var(--x, 0), -10vh, 0) rotate(0deg); opacity: 0; }
       8%{ opacity: 1; }
-      100%{
-        transform: translate3d(var(--x, 0), 110vh, 0) rotate(var(--rot, 540deg));
-        opacity: 0;
-      }
+      100%{ transform: translate3d(var(--x, 0), 110vh, 0) rotate(var(--rot, 540deg)); opacity: 0; }
     }
 
-    /* ====== MOBILE ONLY ====== */
     @media (max-width:760px){
       td{
         aspect-ratio: 3 / 4;
@@ -431,7 +406,6 @@
 
   <div class="toast" id="toast"></div>
 
-  <!-- Bingo celebration overlay -->
   <div class="bingoOverlay" id="bingoOverlay" aria-hidden="true">
     <div class="bingoBanner">
       <div class="bingoTitle">BINGO! 🍏</div>
@@ -515,13 +489,10 @@ const POOL = [
   "Crystal gets merch ideas from an older Sylus banner"
 ];
 
-// Bingo constants
 const SIZE = 5;
 const FREE_INDEX = 12;
 
-/** =========================
- *  2) SEEDED RANDOM (shareable)
- *  ========================= */
+/** Seeded random */
 function xmur3(str) {
   let h = 1779033703 ^ str.length;
   for (let i = 0; i < str.length; i++) {
@@ -551,9 +522,6 @@ function randomSeed(){
   return Math.random().toString(36).slice(2, 10) + "-" + Date.now().toString(36);
 }
 
-/** =========================
- *  3) CARD GENERATION
- *  ========================= */
 function shuffle(array, rand){
   const a = array.slice();
   for(let i = a.length - 1; i > 0; i--){
@@ -564,27 +532,18 @@ function shuffle(array, rand){
 }
 
 function buildCardItems(seedStr){
-  if (POOL.length < 24) {
-    throw new Error("Pool must contain at least 24 items (excluding FREE).");
-  }
+  if (POOL.length < 24) throw new Error("Pool must contain at least 24 items (excluding FREE).");
   const rand = rngFromSeed(seedStr);
   const picked = shuffle(POOL, rand).slice(0, 24);
   const cells = new Array(25);
 
   let p = 0;
   for(let i=0;i<25;i++){
-    if(i === FREE_INDEX){
-      cells[i] = "FREE";
-    } else {
-      cells[i] = picked[p++];
-    }
+    cells[i] = (i === FREE_INDEX) ? "FREE" : picked[p++];
   }
   return cells;
 }
 
-/** =========================
- *  4) RENDER + INTERACTION
- *  ========================= */
 const bodyEl = document.getElementById("bingoBody");
 const seedLabel = document.getElementById("seedLabel");
 const statusEl = document.getElementById("status");
@@ -596,7 +555,6 @@ const overlaySubEl = document.getElementById("bingoSub");
 let lastWinCount = 0;
 let overlayTimer = null;
 
-// IMPORTANT: global state so Reset Marks can't desync old click handlers
 let currentSeed = null;
 let currentMarks = new Array(25).fill(false);
 
@@ -632,12 +590,9 @@ function saveMarks(seedStr, marks){
 }
 
 function celebrateBingo(winCount){
-  overlaySubEl.textContent = winCount === 1
-    ? "You got 1 line! ✨"
-    : `You got ${winCount} lines! ✨`;
-
+  overlaySubEl.textContent = winCount === 1 ? "You got 1 line! ✨" : `You got ${winCount} lines! ✨`;
   overlayEl.classList.remove("show");
-  void overlayEl.offsetWidth; // force reflow
+  void overlayEl.offsetWidth;
   overlayEl.classList.add("show");
 
   const emojis = ["🍎","🍏","🍃","✨"];
@@ -647,12 +602,12 @@ function celebrateBingo(winCount){
     s.className = "confetti";
     s.textContent = emojis[Math.floor(Math.random()*emojis.length)];
 
-    const left = Math.random() * 100;          // vw
-    const drift = (Math.random() * 40 - 20);   // vw
-    const dur = 2.2 + Math.random() * 1.6;     // s
-    const delay = Math.random() * 0.35;        // s
-    const size = 14 + Math.random() * 16;      // px
-    const rot = 360 + Math.random() * 720;     // deg
+    const left = Math.random() * 100;
+    const drift = (Math.random() * 40 - 20);
+    const dur = 2.2 + Math.random() * 1.6;
+    const delay = Math.random() * 0.35;
+    const size = 14 + Math.random() * 16;
+    const rot = 360 + Math.random() * 720;
 
     s.style.left = left + "vw";
     s.style.fontSize = size + "px";
@@ -662,9 +617,7 @@ function celebrateBingo(winCount){
     s.style.animationDelay = delay + "s";
 
     overlayEl.appendChild(s);
-
-    const removeAfter = (dur + delay) * 1000 + 50;
-    setTimeout(()=>s.remove(), removeAfter);
+    setTimeout(()=>s.remove(), (dur + delay) * 1000 + 50);
   }
 
   if(overlayTimer) clearTimeout(overlayTimer);
@@ -781,9 +734,7 @@ function renderCard(seedStr){
   updateBingoHighlights(currentMarks);
 }
 
-/** =========================
- *  5) BUTTONS
- *  ========================= */
+/** Buttons */
 document.getElementById("newCardBtn").addEventListener("click", () => {
   const seedStr = randomSeed();
   setSeedInUrl(seedStr);
@@ -804,29 +755,22 @@ document.getElementById("copyLinkBtn").addEventListener("click", async () => {
 });
 
 document.getElementById("resetMarksBtn").addEventListener("click", () => {
-  const seedStr = getSeedFromUrl();
-  if(!seedStr) return;
-
-  currentSeed = seedStr;
+  if(!currentSeed) return;
   currentMarks = new Array(25).fill(false);
   saveMarks(currentSeed, currentMarks);
-
-  lastWinCount = 0;
   overlayEl.classList.remove("show");
   renderCard(currentSeed);
-
   toast("Marks reset 🧺");
 });
 
 /** =========================
- *  6) INIT
+ *  INIT (IMPORTANT CHANGE)
+ *  Always generate a NEW card on refresh/load
  *  ========================= */
 (function init(){
-  let seedStr = getSeedFromUrl();
-  if(!seedStr){
-    seedStr = randomSeed();
-    setSeedInUrl(seedStr);
-  }
+  const seedStr = randomSeed();
+  setSeedInUrl(seedStr);
+  localStorage.removeItem(storageKey(seedStr)); // ensure clean start every load
   renderCard(seedStr);
 })();
 </script>
