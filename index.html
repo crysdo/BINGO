@@ -409,7 +409,7 @@
   <div class="bingoOverlay" id="bingoOverlay" aria-hidden="true">
     <div class="bingoBanner">
       <div class="bingoTitle">BINGO! 🍏</div>
-      <div class="bingoSub" id="bingoSub">You got a line!</div>
+      <div class="bingoSub" id="bingoSub">New card coming up…</div>
     </div>
   </div>
 
@@ -555,8 +555,13 @@ const overlaySubEl = document.getElementById("bingoSub");
 let lastWinCount = 0;
 let overlayTimer = null;
 
+// global state (prevents reset desync)
 let currentSeed = null;
 let currentMarks = new Array(25).fill(false);
+
+// NEW: lock so you can't keep earning multiple bingos on same card
+let bingoLock = false;
+let nextCardTimer = null;
 
 function toast(msg){
   toastEl.textContent = msg;
@@ -564,10 +569,6 @@ function toast(msg){
   setTimeout(()=>toastEl.classList.remove("show"), 1400);
 }
 
-function getSeedFromUrl(){
-  const url = new URL(window.location.href);
-  return url.searchParams.get("seed");
-}
 function setSeedInUrl(seedStr){
   const url = new URL(window.location.href);
   url.searchParams.set("seed", seedStr);
@@ -589,8 +590,25 @@ function saveMarks(seedStr, marks){
   localStorage.setItem(storageKey(seedStr), JSON.stringify(marks));
 }
 
-function celebrateBingo(winCount){
-  overlaySubEl.textContent = winCount === 1 ? "You got 1 line! ✨" : `You got ${winCount} lines! ✨`;
+function startNewCard(reasonText){
+  if(nextCardTimer) clearTimeout(nextCardTimer);
+  bingoLock = false;
+  lastWinCount = 0;
+
+  const seedStr = randomSeed();
+  setSeedInUrl(seedStr);
+  localStorage.removeItem(storageKey(seedStr)); // always clean start
+  overlayEl.classList.remove("show");
+  renderCard(seedStr);
+
+  if(reasonText) toast(reasonText);
+}
+
+function celebrateBingoAndThenNewCard(){
+  // prevent multiple lines / multiple celebrations on same card
+  bingoLock = true;
+
+  overlaySubEl.textContent = "New card coming up… ✨";
   overlayEl.classList.remove("show");
   void overlayEl.offsetWidth;
   overlayEl.classList.add("show");
@@ -622,6 +640,12 @@ function celebrateBingo(winCount){
 
   if(overlayTimer) clearTimeout(overlayTimer);
   overlayTimer = setTimeout(()=>overlayEl.classList.remove("show"), 2300);
+
+  // NEW: after a short moment, auto-generate a new card
+  if(nextCardTimer) clearTimeout(nextCardTimer);
+  nextCardTimer = setTimeout(() => {
+    startNewCard("New card 🎴");
+  }, 1400);
 }
 
 function lines(){
@@ -650,18 +674,20 @@ function updateBingoHighlights(marks){
   }
 
   if(winLines.length){
-    statusEl.textContent = `BINGO! (${winLines.length} line${winLines.length>1?"s":""}) 🍏`;
+    statusEl.textContent = `BINGO! 🍏`;
     statusEl.style.color = "var(--win)";
 
-    const winSet = new Set(winLines.flat());
+    // highlight ONLY the first winning line (so it looks clean)
+    const winSet = new Set(winLines[0]);
     [...bodyEl.querySelectorAll("td")].forEach(td => {
       const i = Number(td.dataset.index);
       if(winSet.has(i)) td.classList.add("win");
     });
 
-    if(winLines.length > lastWinCount){
-      celebrateBingo(winLines.length);
-      lastWinCount = winLines.length;
+    // NEW: only allow the first bingo, then immediately move to a new card
+    if(!bingoLock && lastWinCount === 0){
+      lastWinCount = 1;
+      celebrateBingoAndThenNewCard();
     }
   } else {
     statusEl.textContent = "No bingo yet 🍏";
@@ -679,6 +705,7 @@ function renderCard(seedStr){
 
   bodyEl.innerHTML = "";
   lastWinCount = 0;
+  bingoLock = false;
 
   let idx = 0;
   for(let r=0;r<SIZE;r++){
@@ -689,6 +716,7 @@ function renderCard(seedStr){
 
       const attachToggle = () => {
         td.addEventListener("click", () => {
+          if(bingoLock) return; // NEW: once bingo happens, no more clicking this card
           const i = Number(td.dataset.index);
           currentMarks[i] = !currentMarks[i];
           td.classList.toggle("marked", currentMarks[i]);
@@ -736,12 +764,7 @@ function renderCard(seedStr){
 
 /** Buttons */
 document.getElementById("newCardBtn").addEventListener("click", () => {
-  const seedStr = randomSeed();
-  setSeedInUrl(seedStr);
-  localStorage.removeItem(storageKey(seedStr));
-  overlayEl.classList.remove("show");
-  renderCard(seedStr);
-  toast("New card generated 🍎");
+  startNewCard("New card generated 🍎");
 });
 
 document.getElementById("copyLinkBtn").addEventListener("click", async () => {
@@ -756,6 +779,10 @@ document.getElementById("copyLinkBtn").addEventListener("click", async () => {
 
 document.getElementById("resetMarksBtn").addEventListener("click", () => {
   if(!currentSeed) return;
+  bingoLock = false;
+  lastWinCount = 0;
+  if(nextCardTimer) clearTimeout(nextCardTimer);
+
   currentMarks = new Array(25).fill(false);
   saveMarks(currentSeed, currentMarks);
   overlayEl.classList.remove("show");
@@ -763,15 +790,9 @@ document.getElementById("resetMarksBtn").addEventListener("click", () => {
   toast("Marks reset 🧺");
 });
 
-/** =========================
- *  INIT (IMPORTANT CHANGE)
- *  Always generate a NEW card on refresh/load
- *  ========================= */
+/** INIT: always new card on refresh/load */
 (function init(){
-  const seedStr = randomSeed();
-  setSeedInUrl(seedStr);
-  localStorage.removeItem(storageKey(seedStr)); // ensure clean start every load
-  renderCard(seedStr);
+  startNewCard(); // no toast on load
 })();
 </script>
 </body>
