@@ -409,7 +409,7 @@
   <div class="bingoOverlay" id="bingoOverlay" aria-hidden="true">
     <div class="bingoBanner">
       <div class="bingoTitle">BINGO! 🍏</div>
-      <div class="bingoSub" id="bingoSub">New card coming up…</div>
+      <div class="bingoSub" id="bingoSub">Refresh the page for a new card ✨</div>
     </div>
   </div>
 
@@ -553,15 +553,13 @@ const overlayEl = document.getElementById("bingoOverlay");
 const overlaySubEl = document.getElementById("bingoSub");
 
 let lastWinCount = 0;
-let overlayTimer = null;
 
-// global state (prevents reset desync)
+// global state
 let currentSeed = null;
 let currentMarks = new Array(25).fill(false);
 
-// NEW: lock so you can't keep earning multiple bingos on same card
+// lock so you can't keep earning multiple bingos on same card
 let bingoLock = false;
-let nextCardTimer = null;
 
 function toast(msg){
   toastEl.textContent = msg;
@@ -591,7 +589,6 @@ function saveMarks(seedStr, marks){
 }
 
 function startNewCard(reasonText){
-  if(nextCardTimer) clearTimeout(nextCardTimer);
   bingoLock = false;
   lastWinCount = 0;
 
@@ -604,17 +601,18 @@ function startNewCard(reasonText){
   if(reasonText) toast(reasonText);
 }
 
-function celebrateBingoAndThenNewCard(){
-  // prevent multiple lines / multiple celebrations on same card
+/** ✅ UPDATED: celebrate + STAY (no auto-new-card) */
+function celebrateBingoAndStay(){
+  // prevent more bingos / clicks
   bingoLock = true;
 
-  overlaySubEl.textContent = "New card coming up… ✨";
+  overlaySubEl.textContent = "Refresh the page for a new card ✨";
   overlayEl.classList.remove("show");
   void overlayEl.offsetWidth;
   overlayEl.classList.add("show");
 
   const emojis = ["🍎","🍏","🍃","✨"];
-  const pieces = 30;
+  const pieces = 34;
   for(let i=0;i<pieces;i++){
     const s = document.createElement("span");
     s.className = "confetti";
@@ -635,17 +633,11 @@ function celebrateBingoAndThenNewCard(){
     s.style.animationDelay = delay + "s";
 
     overlayEl.appendChild(s);
-    setTimeout(()=>s.remove(), (dur + delay) * 1000 + 50);
+    setTimeout(()=>s.remove(), (dur + delay) * 1000 + 100);
   }
 
-  if(overlayTimer) clearTimeout(overlayTimer);
-  overlayTimer = setTimeout(()=>overlayEl.classList.remove("show"), 2300);
-
-  // NEW: after a short moment, auto-generate a new card
-  if(nextCardTimer) clearTimeout(nextCardTimer);
-  nextCardTimer = setTimeout(() => {
-    startNewCard("New card 🎴");
-  }, 1400);
+  // NOTE: we do NOT hide the overlay
+  // NOTE: we do NOT generate a new card
 }
 
 function lines(){
@@ -677,17 +669,17 @@ function updateBingoHighlights(marks){
     statusEl.textContent = `BINGO! 🍏`;
     statusEl.style.color = "var(--win)";
 
-    // highlight ONLY the first winning line (so it looks clean)
+    // highlight ONLY first winning line
     const winSet = new Set(winLines[0]);
     [...bodyEl.querySelectorAll("td")].forEach(td => {
       const i = Number(td.dataset.index);
       if(winSet.has(i)) td.classList.add("win");
     });
 
-    // NEW: only allow the first bingo, then immediately move to a new card
+    // ✅ Celebrate once, then stay on bingo page
     if(!bingoLock && lastWinCount === 0){
       lastWinCount = 1;
-      celebrateBingoAndThenNewCard();
+      celebrateBingoAndStay();
     }
   } else {
     statusEl.textContent = "No bingo yet 🍏";
@@ -716,7 +708,7 @@ function renderCard(seedStr){
 
       const attachToggle = () => {
         td.addEventListener("click", () => {
-          if(bingoLock) return; // NEW: once bingo happens, no more clicking this card
+          if(bingoLock) return;
           const i = Number(td.dataset.index);
           currentMarks[i] = !currentMarks[i];
           td.classList.toggle("marked", currentMarks[i]);
@@ -779,9 +771,9 @@ document.getElementById("copyLinkBtn").addEventListener("click", async () => {
 
 document.getElementById("resetMarksBtn").addEventListener("click", () => {
   if(!currentSeed) return;
+
   bingoLock = false;
   lastWinCount = 0;
-  if(nextCardTimer) clearTimeout(nextCardTimer);
 
   currentMarks = new Array(25).fill(false);
   saveMarks(currentSeed, currentMarks);
