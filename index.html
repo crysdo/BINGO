@@ -157,7 +157,7 @@
     table{
       width:100%;
       border-collapse:separate;
-      border-spacing:10px;
+      border-spacing: clamp(6px, 1.1vw, 10px);
       table-layout:fixed;
     }
     th{
@@ -170,20 +170,30 @@
     }
 
     td{
-      background: rgba(255,255,255,.85);
-      border:1px solid rgba(198,69,58,.38);
-      border-radius:18px;
-      padding:14px 12px;
-      height:110px;
-      vertical-align:middle;
-      text-align:center;
-      font-size:14px;
-      line-height:1.25;
-      cursor:pointer;
-      user-select:none;
-      position:relative;
-      overflow:hidden;
-      box-shadow: 0 6px 18px rgba(46,42,35,.06);
+    background: rgba(255,255,255,.85);
+    border:1px solid rgba(198,69,58,.38);
+    border-radius:18px;
+
+  /* ✅ responsive square cells */
+  aspect-ratio: 1 / 1;
+  height: auto;
+
+  /* ✅ responsive spacing + text */
+  padding: clamp(8px, 1.2vw, 14px);
+  font-size: clamp(11px, 1.25vw, 14px);
+  line-height: 1.25;
+
+  vertical-align: middle;
+  text-align:center;
+  cursor:pointer;
+  user-select:none;
+  position:relative;
+  overflow:hidden;
+  box-shadow: 0 6px 18px rgba(46,42,35,.06);
+
+  /* keeps long text from making cells look weird */
+  word-break: break-word;
+  overflow-wrap: anywhere;
     }
     td:hover{border-color: rgba(198,69,58,.70)}
 
@@ -263,10 +273,15 @@
     }
     .toast.show{opacity:1}
 
-    @media (max-width:760px){
-      td{height:96px; font-size:13px; padding:12px 10px}
-      table{border-spacing:8px}
-      .corner{width:170px;height:170px}
+@media (max-width:760px){
+  /* ✅ let aspect-ratio control sizing */
+  td{
+    border-radius:16px;
+    padding: 8px;
+    font-size: 11px;
+  }
+  table{ border-spacing: 6px; }
+  .corner{ width:150px; height:150px; }
     }
   </style>
 </head>
@@ -645,3 +660,4 @@ document.getElementById("resetMarksBtn").addEventListener("click", () => {
 </script>
 </body>
 </html>
+
