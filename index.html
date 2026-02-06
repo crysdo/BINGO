@@ -269,6 +269,49 @@
       padding:0 6px;
     }
 
+    /* ✅ Proof panel (shows winning 5 + checked squares) */
+    .proofWrap{
+      max-width:860px;
+      margin: 10px auto 0;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 0 6px;
+    }
+
+    .proofBox{
+      background: rgba(255,255,255,.72);
+      border: 1px solid rgba(46,42,35,.14);
+      border-radius: 16px;
+      padding: 10px 12px;
+      box-shadow: 0 10px 22px rgba(46,42,35,.06);
+    }
+
+    .proofTitle{
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: .04em;
+      margin-bottom: 6px;
+      color: rgba(46,42,35,.75);
+    }
+
+    .proofList{
+      margin: 0;
+      padding-left: 18px;
+      color: rgba(46,42,35,.85);
+      font-size: 12px;
+      line-height: 1.25;
+      max-height: 220px;
+      overflow:auto;
+    }
+
+    .proofList li{ margin: 4px 0; }
+
+    .proofEmpty{
+      color: rgba(46,42,35,.55);
+      font-style: italic;
+    }
+
     .toast{
       position:fixed;
       bottom:18px; left:50%;
@@ -294,7 +337,7 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      pointer-events:none;
+      pointer-events:none; /* overlay won't block seeing/clicking tiles */
       opacity:0;
       visibility:hidden;
       transition: opacity .25s ease, visibility .25s ease;
@@ -347,6 +390,7 @@
       filter: drop-shadow(0 6px 10px rgba(46,42,35,.18));
       animation: confettiFall linear forwards;
       will-change: transform, opacity;
+      pointer-events:none;
     }
     @keyframes confettiFall{
       0%{ transform: translate3d(var(--x, 0), -10vh, 0) rotate(0deg); opacity: 0; }
@@ -364,6 +408,8 @@
       }
       .corner{ width:150px; height:150px; }
       .bingoTitle{ font-size: 18px; }
+      .proofWrap{ grid-template-columns: 1fr; }
+      .proofList{ max-height: 180px; }
     }
   </style>
 </head>
@@ -401,6 +447,23 @@
         <div>Tip: share the link so everyone gets the <strong>same</strong> card.</div>
         <div id="status">No bingo yet 🍏</div>
       </div>
+
+      <!-- ✅ Proof panels -->
+      <div class="proofWrap" aria-live="polite">
+        <div class="proofBox">
+          <div class="proofTitle">Bingo proof (winning 5):</div>
+          <ol id="bingoProof" class="proofList">
+            <li class="proofEmpty">No bingo yet.</li>
+          </ol>
+        </div>
+        <div class="proofBox">
+          <div class="proofTitle">Checked squares:</div>
+          <ol id="checkedList" class="proofList">
+            <li class="proofEmpty">Nothing checked yet.</li>
+          </ol>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -552,11 +615,15 @@ const toastEl = document.getElementById("toast");
 const overlayEl = document.getElementById("bingoOverlay");
 const overlaySubEl = document.getElementById("bingoSub");
 
+const bingoProofEl = document.getElementById("bingoProof");
+const checkedListEl = document.getElementById("checkedList");
+
 let lastWinCount = 0;
 
 // global state
 let currentSeed = null;
 let currentMarks = new Array(25).fill(false);
+let currentCells = new Array(25).fill("");
 
 // lock so you can't keep earning multiple bingos on same card
 let bingoLock = false;
@@ -601,9 +668,8 @@ function startNewCard(reasonText){
   if(reasonText) toast(reasonText);
 }
 
-/** ✅ UPDATED: celebrate + STAY (no auto-new-card) */
+/** celebrate + STAY */
 function celebrateBingoAndStay(){
-  // prevent more bingos / clicks
   bingoLock = true;
 
   overlaySubEl.textContent = "Refresh the page for a new card ✨";
@@ -635,9 +701,6 @@ function celebrateBingoAndStay(){
     overlayEl.appendChild(s);
     setTimeout(()=>s.remove(), (dur + delay) * 1000 + 100);
   }
-
-  // NOTE: we do NOT hide the overlay
-  // NOTE: we do NOT generate a new card
 }
 
 function lines(){
@@ -655,6 +718,38 @@ function lines(){
   ls.push([0,6,12,18,24]);
   ls.push([4,8,12,16,20]);
   return ls;
+}
+
+/* ✅ Proof panel update */
+function updateProofPanels(winLine){
+  // Winning 5
+  bingoProofEl.innerHTML = "";
+  if(!winLine || winLine.length !== 5){
+    bingoProofEl.innerHTML = `<li class="proofEmpty">No bingo yet.</li>`;
+  } else {
+    for(const idx of winLine){
+      const li = document.createElement("li");
+      li.textContent = (idx === FREE_INDEX) ? "FREE" : currentCells[idx];
+      bingoProofEl.appendChild(li);
+    }
+  }
+
+  // Checked squares (excluding FREE)
+  checkedListEl.innerHTML = "";
+  const checked = [];
+  for(let i=0;i<25;i++){
+    if(i === FREE_INDEX) continue;
+    if(currentMarks[i]) checked.push(currentCells[i]);
+  }
+  if(checked.length === 0){
+    checkedListEl.innerHTML = `<li class="proofEmpty">Nothing checked yet.</li>`;
+  } else {
+    for(const txt of checked){
+      const li = document.createElement("li");
+      li.textContent = txt;
+      checkedListEl.appendChild(li);
+    }
+  }
 }
 
 function updateBingoHighlights(marks){
@@ -676,7 +771,10 @@ function updateBingoHighlights(marks){
       if(winSet.has(i)) td.classList.add("win");
     });
 
-    // ✅ Celebrate once, then stay on bingo page
+    // ✅ update proof with the winning 5
+    updateProofPanels(winLines[0]);
+
+    // celebrate once, then stay
     if(!bingoLock && lastWinCount === 0){
       lastWinCount = 1;
       celebrateBingoAndStay();
@@ -685,6 +783,9 @@ function updateBingoHighlights(marks){
     statusEl.textContent = "No bingo yet 🍏";
     statusEl.style.color = "rgba(46,42,35,.62)";
     lastWinCount = 0;
+
+    // ✅ keep proof panels updated even before bingo
+    updateProofPanels(null);
   }
 }
 
@@ -692,7 +793,7 @@ function renderCard(seedStr){
   currentSeed = seedStr;
   seedLabel.textContent = seedStr;
 
-  const cells = buildCardItems(seedStr);
+  currentCells = buildCardItems(seedStr);
   currentMarks = loadMarks(seedStr);
 
   bodyEl.innerHTML = "";
@@ -740,7 +841,7 @@ function renderCard(seedStr){
         if(currentMarks[idx]) td.classList.add("marked");
         attachToggle();
       } else {
-        td.textContent = cells[idx];
+        td.textContent = currentCells[idx];
         if(currentMarks[idx]) td.classList.add("marked");
         attachToggle();
       }
@@ -751,6 +852,8 @@ function renderCard(seedStr){
     bodyEl.appendChild(tr);
   }
 
+  // Keep proof panels synced on render
+  updateProofPanels(null);
   updateBingoHighlights(currentMarks);
 }
 
