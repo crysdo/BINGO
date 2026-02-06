@@ -205,13 +205,18 @@
       pointer-events:none;
     }
 
+    /* FREE tile styling (always marked, not clickable) */
     td.free{
+      cursor: default;
       border-color: rgba(95,127,80,.75);
       background:
         radial-gradient(circle at 50% 42%, rgba(255,255,255,.95) 0 42%, rgba(255,255,255,.75) 43% 100%);
       font-weight:800;
       letter-spacing:.06em;
     }
+
+    /* Ensure FREE does NOT show the ✓ checkmark (prevents visual clutter) */
+    td.free.marked::after{ content:""; }
 
     td.free.marked{
       background:
@@ -269,49 +274,6 @@
       padding:0 6px;
     }
 
-    /* ✅ Proof panel (shows winning 5 + checked squares) */
-    .proofWrap{
-      max-width:860px;
-      margin: 10px auto 0;
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      padding: 0 6px;
-    }
-
-    .proofBox{
-      background: rgba(255,255,255,.72);
-      border: 1px solid rgba(46,42,35,.14);
-      border-radius: 16px;
-      padding: 10px 12px;
-      box-shadow: 0 10px 22px rgba(46,42,35,.06);
-    }
-
-    .proofTitle{
-      font-weight: 800;
-      font-size: 12px;
-      letter-spacing: .04em;
-      margin-bottom: 6px;
-      color: rgba(46,42,35,.75);
-    }
-
-    .proofList{
-      margin: 0;
-      padding-left: 18px;
-      color: rgba(46,42,35,.85);
-      font-size: 12px;
-      line-height: 1.25;
-      max-height: 220px;
-      overflow:auto;
-    }
-
-    .proofList li{ margin: 4px 0; }
-
-    .proofEmpty{
-      color: rgba(46,42,35,.55);
-      font-style: italic;
-    }
-
     .toast{
       position:fixed;
       bottom:18px; left:50%;
@@ -337,7 +299,7 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      pointer-events:none; /* overlay won't block seeing/clicking tiles */
+      pointer-events:none; /* doesn't block seeing tiles */
       opacity:0;
       visibility:hidden;
       transition: opacity .25s ease, visibility .25s ease;
@@ -354,13 +316,14 @@
       position:relative;
       border-radius: 22px;
       border: 1px solid rgba(46,42,35,.18);
-      background: rgba(255,255,255,.88);
-      padding: 18px 22px 16px;
+      background: rgba(255,255,255,.90);
+      padding: 18px 18px 14px;
       box-shadow: 0 16px 50px rgba(46,42,35,.16);
       text-align:center;
       transform: scale(.92);
       opacity: 0;
       animation: bingoPop .9s ease forwards;
+      width: min(520px, calc(100vw - 36px));
     }
     @keyframes bingoPop{
       0%{ transform: scale(.92) translateY(10px); opacity:0; }
@@ -380,6 +343,36 @@
       color: rgba(46,42,35,.78);
       font-size: 13px;
     }
+
+    /* ✅ Winning 5 list inside the BINGO banner */
+    .bingoProofWrap{
+      margin-top: 12px;
+      border-top: 1px dashed rgba(46,42,35,.22);
+      padding-top: 10px;
+      text-align:left;
+    }
+    .bingoProofTitle{
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: .04em;
+      color: rgba(46,42,35,.78);
+      margin-bottom: 6px;
+      text-align:center;
+    }
+    .bingoProofList{
+      margin: 0;
+      padding-left: 18px;
+      font-size: 12px;
+      line-height: 1.25;
+      color: rgba(46,42,35,.88);
+      max-height: 170px;
+      overflow:auto;
+      background: rgba(251,246,239,.45);
+      border: 1px solid rgba(46,42,35,.12);
+      border-radius: 14px;
+      padding: 10px 12px 10px 26px;
+    }
+    .bingoProofList li{ margin: 4px 0; }
 
     .confetti{
       position:absolute;
@@ -408,8 +401,7 @@
       }
       .corner{ width:150px; height:150px; }
       .bingoTitle{ font-size: 18px; }
-      .proofWrap{ grid-template-columns: 1fr; }
-      .proofList{ max-height: 180px; }
+      .bingoProofList{ max-height: 150px; }
     }
   </style>
 </head>
@@ -447,23 +439,6 @@
         <div>Tip: share the link so everyone gets the <strong>same</strong> card.</div>
         <div id="status">No bingo yet 🍏</div>
       </div>
-
-      <!-- ✅ Proof panels -->
-      <div class="proofWrap" aria-live="polite">
-        <div class="proofBox">
-          <div class="proofTitle">Bingo proof (winning 5):</div>
-          <ol id="bingoProof" class="proofList">
-            <li class="proofEmpty">No bingo yet.</li>
-          </ol>
-        </div>
-        <div class="proofBox">
-          <div class="proofTitle">Checked squares:</div>
-          <ol id="checkedList" class="proofList">
-            <li class="proofEmpty">Nothing checked yet.</li>
-          </ol>
-        </div>
-      </div>
-
     </div>
   </div>
 
@@ -473,6 +448,14 @@
     <div class="bingoBanner">
       <div class="bingoTitle">BINGO! 🍏</div>
       <div class="bingoSub" id="bingoSub">Refresh the page for a new card ✨</div>
+
+      <!-- ✅ Winning 5 proof shows right here during the animation -->
+      <div class="bingoProofWrap">
+        <div class="bingoProofTitle">Winning 5 (proof)</div>
+        <ol class="bingoProofList" id="bingoWinList">
+          <li>—</li>
+        </ol>
+      </div>
     </div>
   </div>
 
@@ -614,9 +597,7 @@ const toastEl = document.getElementById("toast");
 
 const overlayEl = document.getElementById("bingoOverlay");
 const overlaySubEl = document.getElementById("bingoSub");
-
-const bingoProofEl = document.getElementById("bingoProof");
-const checkedListEl = document.getElementById("checkedList");
+const winListEl = document.getElementById("bingoWinList");
 
 let lastWinCount = 0;
 
@@ -668,9 +649,26 @@ function startNewCard(reasonText){
   if(reasonText) toast(reasonText);
 }
 
-/** celebrate + STAY */
-function celebrateBingoAndStay(){
+function setWinList(winLine){
+  winListEl.innerHTML = "";
+  if(!winLine || winLine.length !== 5){
+    const li = document.createElement("li");
+    li.textContent = "—";
+    winListEl.appendChild(li);
+    return;
+  }
+  for(const idx of winLine){
+    const li = document.createElement("li");
+    li.textContent = (idx === FREE_INDEX) ? "FREE" : currentCells[idx];
+    winListEl.appendChild(li);
+  }
+}
+
+/** ✅ UPDATED: celebrate + STAY + show proof list in the overlay */
+function celebrateBingoAndStay(winLine){
   bingoLock = true;
+
+  setWinList(winLine);
 
   overlaySubEl.textContent = "Refresh the page for a new card ✨";
   overlayEl.classList.remove("show");
@@ -720,38 +718,6 @@ function lines(){
   return ls;
 }
 
-/* ✅ Proof panel update */
-function updateProofPanels(winLine){
-  // Winning 5
-  bingoProofEl.innerHTML = "";
-  if(!winLine || winLine.length !== 5){
-    bingoProofEl.innerHTML = `<li class="proofEmpty">No bingo yet.</li>`;
-  } else {
-    for(const idx of winLine){
-      const li = document.createElement("li");
-      li.textContent = (idx === FREE_INDEX) ? "FREE" : currentCells[idx];
-      bingoProofEl.appendChild(li);
-    }
-  }
-
-  // Checked squares (excluding FREE)
-  checkedListEl.innerHTML = "";
-  const checked = [];
-  for(let i=0;i<25;i++){
-    if(i === FREE_INDEX) continue;
-    if(currentMarks[i]) checked.push(currentCells[i]);
-  }
-  if(checked.length === 0){
-    checkedListEl.innerHTML = `<li class="proofEmpty">Nothing checked yet.</li>`;
-  } else {
-    for(const txt of checked){
-      const li = document.createElement("li");
-      li.textContent = txt;
-      checkedListEl.appendChild(li);
-    }
-  }
-}
-
 function updateBingoHighlights(marks){
   [...bodyEl.querySelectorAll("td")].forEach(td => td.classList.remove("win"));
 
@@ -771,21 +737,16 @@ function updateBingoHighlights(marks){
       if(winSet.has(i)) td.classList.add("win");
     });
 
-    // ✅ update proof with the winning 5
-    updateProofPanels(winLines[0]);
-
-    // celebrate once, then stay
+    // Celebrate once
     if(!bingoLock && lastWinCount === 0){
       lastWinCount = 1;
-      celebrateBingoAndStay();
+      celebrateBingoAndStay(winLines[0]);
     }
   } else {
     statusEl.textContent = "No bingo yet 🍏";
     statusEl.style.color = "rgba(46,42,35,.62)";
     lastWinCount = 0;
-
-    // ✅ keep proof panels updated even before bingo
-    updateProofPanels(null);
+    setWinList(null);
   }
 }
 
@@ -795,6 +756,9 @@ function renderCard(seedStr){
 
   currentCells = buildCardItems(seedStr);
   currentMarks = loadMarks(seedStr);
+
+  // ✅ FREE is always marked (and not toggleable)
+  currentMarks[FREE_INDEX] = true;
 
   bodyEl.innerHTML = "";
   lastWinCount = 0;
@@ -807,7 +771,31 @@ function renderCard(seedStr){
       const td = document.createElement("td");
       td.dataset.index = String(idx);
 
-      const attachToggle = () => {
+      if(idx === FREE_INDEX){
+        td.classList.add("free","marked");
+        td.innerHTML = `
+          <div class="freeBadge">
+            <svg class="freeApple" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <defs>
+                <radialGradient id="g_free" cx="40%" cy="30%" r="70%">
+                  <stop offset="0" stop-color="#fff1eb"/>
+                  <stop offset="1" stop-color="#c6453a"/>
+                </radialGradient>
+              </defs>
+              <path d="M28 14c4-6 12-8 18-6" fill="none" stroke="#3f6a45" stroke-width="4" stroke-linecap="round"/>
+              <path d="M34 16c-2-8 4-14 10-15" fill="none" stroke="#3f6a45" stroke-width="3" stroke-linecap="round"/>
+              <path d="M32 18c-14 0-23 11-23 24 0 15 12 26 29 26 16 0 29-11 29-26 0-13-9-24-23-24" fill="url(#g_free)"/>
+              <path d="M18 20c-8-3-14-9-16-16 10-1 18 3 22 9" fill="#5f7f50" opacity=".9"/>
+              <circle cx="40" cy="36" r="3.5" fill="#fff1eb" opacity=".55"/>
+            </svg>
+            <span>FREE</span>
+          </div>
+        `;
+        // no click handler for free
+      } else {
+        td.textContent = currentCells[idx];
+        if(currentMarks[idx]) td.classList.add("marked");
+
         td.addEventListener("click", () => {
           if(bingoLock) return;
           const i = Number(td.dataset.index);
@@ -816,34 +804,6 @@ function renderCard(seedStr){
           saveMarks(currentSeed, currentMarks);
           updateBingoHighlights(currentMarks);
         });
-      };
-
-      if(idx === FREE_INDEX){
-        td.classList.add("free");
-        td.innerHTML = `
-          <div class="freeBadge">
-            <svg class="freeApple" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <defs>
-                <radialGradient id="g" cx="40%" cy="30%" r="70%">
-                  <stop offset="0" stop-color="#fff1eb"/>
-                  <stop offset="1" stop-color="#c6453a"/>
-                </radialGradient>
-              </defs>
-              <path d="M28 14c4-6 12-8 18-6" fill="none" stroke="#3f6a45" stroke-width="4" stroke-linecap="round"/>
-              <path d="M34 16c-2-8 4-14 10-15" fill="none" stroke="#3f6a45" stroke-width="3" stroke-linecap="round"/>
-              <path d="M32 18c-14 0-23 11-23 24 0 15 12 26 29 26 16 0 29-11 29-26 0-13-9-24-23-24" fill="url(#g)"/>
-              <path d="M18 20c-8-3-14-9-16-16 10-1 18 3 22 9" fill="#5f7f50" opacity=".9"/>
-              <circle cx="40" cy="36" r="3.5" fill="#fff1eb" opacity=".55"/>
-            </svg>
-            <span>FREE</span>
-          </div>
-        `;
-        if(currentMarks[idx]) td.classList.add("marked");
-        attachToggle();
-      } else {
-        td.textContent = currentCells[idx];
-        if(currentMarks[idx]) td.classList.add("marked");
-        attachToggle();
       }
 
       tr.appendChild(td);
@@ -852,8 +812,7 @@ function renderCard(seedStr){
     bodyEl.appendChild(tr);
   }
 
-  // Keep proof panels synced on render
-  updateProofPanels(null);
+  setWinList(null);
   updateBingoHighlights(currentMarks);
 }
 
@@ -879,7 +838,9 @@ document.getElementById("resetMarksBtn").addEventListener("click", () => {
   lastWinCount = 0;
 
   currentMarks = new Array(25).fill(false);
+  currentMarks[FREE_INDEX] = true;
   saveMarks(currentSeed, currentMarks);
+
   overlayEl.classList.remove("show");
   renderCard(currentSeed);
   toast("Marks reset 🧺");
